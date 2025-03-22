@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import {Student} from "../models/studentModel.js"; //named import
-import { Mentor } from "../models/mentorModel.js"; // ✅ Import Mentor Model
+import { Mentor } from "../models/mentorModel.js"; // Import Mentor Model
 import mongoose from 'mongoose';
 
 
@@ -10,41 +10,41 @@ export const createAStudent = async (req, res) => {
     try {
         const { name, roll_no, email, mentor_id } = req.body;
 
-        // ✅ Validate required fields
+        // Validate required fields
         if (!name || !roll_no || !email || !mentor_id) {
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        // ✅ Ensure email ends with @clg.ac.in
+        // Ensure email ends with @clg.ac.in
         if (!email.endsWith("@cbit.org.in")) {
             return res.status(400).json({ error: "Only college emails (@cbit.org.in) are allowed." });
         }
-         // ✅ Check if student already exists (by roll_no)
+         // Check if student already exists (by roll_no)
          const existingStudent = await Student.findOne({ roll_no });
          if (existingStudent) {
              return res.status(400).json({ error: "Student already exists." });
              
          }
-                 // ✅ Check if mentor exists
+                 // Check if mentor exists
         const mentor = await Mentor.findOne({mentor_id});
         if (!mentor) {
             return res.status(404).json({ error: "Mentor not found." });
         }
 
-        // ✅ Generate default password as roll number + "P"
+        // Generate default password as roll number + "P"
         const defaultPassword = roll_no + "P";
 
-        // ✅ Hash the default password before saving
+        // Hash the default password before saving
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-        // ✅ Create student with hashed password
+        //  Create student with hashed password
         const student = new Student({ ...req.body, password: hashedPassword });
         await student.save();
 
-          // ✅ Populate mentor details before sending response
+          // Populate mentor details before sending response
           await student.populate("mentor_id", "name"); // Fetch only mentor's name
 
-         // ✅ Exclude password from response for security
+         // Exclude password from response for security
          const studentData = student.toObject();
          delete studentData.password;
 
@@ -54,7 +54,7 @@ export const createAStudent = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-//2. ✅ Search students by roll_no, name, or skills
+//2.  Search students by roll_no, name, or skills
 export const searchStudents = async (req, res) => {
     try {
          // Get the search query from the URL's query parameter
@@ -65,7 +65,7 @@ export const searchStudents = async (req, res) => {
             return res.status(400).json({ error: "Search query is required." });
         }
 
-        // ✅ Define search conditions
+        //  Define search conditions
         const searchConditions = [
             { roll_no: searchQuery }, // Exact match on roll number
             { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive name search
@@ -73,14 +73,14 @@ export const searchStudents = async (req, res) => {
             { _id: new mongoose.Types.ObjectId(searchQuery) } // Search by _id if the search query is a valid ObjectId
         ];
 
-        // ✅ Perform search
+        //  Perform search
         const students = await Student.find({ $or: searchConditions });
 
         if (students.length > 0) {
             return res.json({ results: students });
         }
 
-       /* // ✅ If no results, integrate GenAI for typo correction or fuzzy matching
+       /* //  If no results, integrate GenAI for typo correction or fuzzy matching
         const correctedQuery = await getCorrectedQuery(searchQuery); // Implement AI logic separately
         const fuzzyResults = await Student.find({
             $or: [
