@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Student } from "../models/studentModel.js"; //named import
+import {Student} from "../models/studentModel.js"; //named import
 import { Mentor } from "../models/mentorModel.js"; // ✅ Import Mentor Model
 import mongoose from 'mongoose';
 
@@ -11,11 +11,11 @@ export const createAStudent = async (req, res) => {
         const { name, roll_no, email /*, mentor_id*/ } = req.body;
 
         // ✅ Validate required fields
-        if (!name || !roll_no || !email /* || !mentor_id */) {   // AFTER ADDING MENTOR || !mentor_id
+        if (!name || !roll_no || !email || !mentor_id) {   //AFTER ADDING MENTOR
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        // ✅ Ensure email ends with @clg.ac.in
+        // Ensure email ends with @clg.ac.in
         if (!email.endsWith("@cbit.org.in")) {
             return res.status(400).json({ error: "Only college emails (@cbit.org.in) are allowed." });
         }
@@ -28,22 +28,32 @@ export const createAStudent = async (req, res) => {
 
         // ✅ Check if mentor exists   //AFTER ADDING MENTOR
         /* const mentor = await Mentor.findOne({ mentor_id });  
+         // Check if student already exists (by roll_no)
+         const existingStudent = await Student.findOne({ roll_no });
+         if (existingStudent) {
+             return res.status(400).json({ error: "Student already exists." });
+             
+         }
+                 // Check if mentor exists
+        const mentor = await Mentor.findOne({mentor_id});
         if (!mentor) {
             return res.status(404).json({ error: "Mentor not found." });  
         } */
 
-        // ✅ Generate default password as roll number + "P"
+        // Generate default password as roll number + "P"
         const defaultPassword = roll_no + "P";
 
-        // ✅ Hash the default password before saving
+        // Hash the default password before saving
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-        // ✅ Create student with hashed password
+        //  Create student with hashed password
         const student = new Student({ ...req.body, password: hashedPassword });
         await student.save();
 
         // ✅ Populate mentor details before sending response      //AFTER ADDING MENTOR
         // await student.populate("mentor_id", "name"); // Fetch only mentor's name
+          // Populate mentor details before sending response
+          await student.populate("mentor_id", "name"); // Fetch only mentor's name
 
         // ✅ Exclude password from response for security
         const studentData = student.toObject();
@@ -57,6 +67,7 @@ export const createAStudent = async (req, res) => {
 };
 
 // 2. ✅ Search students by roll_no, name, or skills
+//2.  Search students by roll_no, name, or skills
 export const searchStudents = async (req, res) => {
     try {
         // Get the search query from the URL's query parameter
@@ -91,6 +102,9 @@ export const searchStudents = async (req, res) => {
             // Perform search
             students = await Student.find({ $or: searchConditions });
 
+        //  Perform search
+        const students = await Student.find({ $or: searchConditions });
+
             if (students.length > 0) {
                 return res.json({ results: students });
             }
@@ -98,6 +112,22 @@ export const searchStudents = async (req, res) => {
 
         // Temporarily handling the Gen AI part
         return res.json({ message: "The GEN AI will fetch results" });
+        if (students.length > 0) {
+            return res.json({ results: students });
+        }
+
+       /* //  If no results, integrate GenAI for typo correction or fuzzy matching
+        const correctedQuery = await getCorrectedQuery(searchQuery); // Implement AI logic separately
+        const fuzzyResults = await Student.find({
+            $or: [
+                { name: { $regex: correctedQuery, $options: "i" } },
+                { skills: { $regex: correctedQuery, $options: "i" } }
+            ]
+        });
+
+        res.json({ correctedQuery, results: fuzzyResults });*/
+        //Temporarily handlling the gen Ai part
+        return res.json ({message:"The GEN AI will fetch results"});
 
     } catch (error) {
         res.status(500).json({ error: error.message });
