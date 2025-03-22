@@ -11,7 +11,7 @@ const studentSchema = new mongoose.Schema({
   },
   password: { type: String, required: true }, // Hashed before saving
   skills: { type: [String], default: [] },
-  mentor_id: { type: mongoose.Schema.Types.ObjectId, ref: "Mentor", required: true }, // ✅ Mentor is now required
+  mentor_id: { type: mongoose.Schema.Types.ObjectId, ref: "Mentor", required: false }, // ✅ Mentor is now required
   resume: { type: String, default: "" }, // Store file path or URL
   profile: {
     projects: { type: [String], default: [] },
