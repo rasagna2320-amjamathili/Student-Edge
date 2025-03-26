@@ -14,7 +14,5 @@ router.post("/createMultiple",createMultipleStudents);
 router.patch("/update", verifyToken, updateStudentProfile);
 router.get("/profile", verifyToken, getStudentProfile);
 
-
-
 export default router;
  
