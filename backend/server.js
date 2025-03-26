@@ -11,7 +11,13 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.listen(5000, '0.0.0.0', () => {
+    console.log('Server running on port 5000');
+});
+app.use(cors({ origin: 'http://172.16.4.70:5000' })); // Replace with frontend system IP
+
+
+
 
 const PORT = process.env.PORT || 5000;   //Listen to .env port or by default take 5000
 
@@ -32,5 +38,4 @@ app.use("/api/students", studentRoutes);
 app.use("/api/jobs",jobRoutes);
 app.use("/api/cdcs",cdcRoutes);
 app.use("/api/mentors",mentorRoutes);
-
-
+app.use("/api/cdc", cdcRoutes);
