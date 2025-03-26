@@ -1,22 +1,29 @@
 import mongoose from "mongoose";
 
 const studentSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  roll_no: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  roll_no: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    match: [/^1601(2[3-6])7(37|33)\d{3}$/, "Invalid roll number format"]
+  },
   email: { 
     type: String, 
     required: true, 
     unique: true, 
-    match: [/^[a-zA-Z0-9._%+-]+@cbit\.org\.in$/, "Only college emails are allowed"]
+    match: [/^ugs\d{2}_\d{3}_(it|cse)\.[a-z]+@cbit\.org\.in$/, "Invalid college email format"]
   },
-  password: { type: String, required: true }, // Hashed before saving
+  password: { type: String, required: true },
+  
+  // New fields added
   skills: { type: [String], default: [] },
-  mentor_id: { type: mongoose.Schema.Types.ObjectId, ref: "Mentor", required: false }, // ✅ Mentor is now required
-  resume: { type: String, default: "" }, // Store file path or URL
-  profile: {
-    projects: { type: [String], default: [] },
-    linkedin: { type: String, default: "" }
-  }
-}, { timestamps: true });  // Adds createdAt & updatedAt
+  certifications: { type: [String], default: [] },
+  participatedTechEvents: { type: [String], default: [] },
+  extraCurricularActivities: { type: [String], default: [] },
+  coCurricularActivities: { type: [String], default: [] },
+  additionalFields: { type: [String], default: [] }
+});
 
-export const Student = mongoose.model("Student", studentSchema);
+const Student = mongoose.model("Student", studentSchema);
+export default Student;
