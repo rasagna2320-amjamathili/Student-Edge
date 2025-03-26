@@ -1,22 +1,17 @@
 import express from "express";
-
 import mongoose, { get } from "mongoose";
-import {createAStudent,searchStudents, updateStudentProfile} from "../Controllers/studentController.js";
-import { authenticateStudent } from "../middlewares/authMiddleware.js";  // Import the middleware
+import {createAStudent,searchStudents, updateStudentProfile, createMultipleStudents, getAllStudents } from "../Controllers/studentController.js";
+import {loginUser,verifyToken} from "../middlewares/authMiddleware.js";  // Import the middleware
 
 const router = express.Router();
 
-// Apply the authentication middleware before updating profile
-router.patch("/update", updateStudentProfile);
-
-  
 
 router.post("/create",createAStudent);
-//router.get("/:idOrRollNo", getStudentProfile);
-// ✅ Search students by roll number, name, or skills
 router.get("/search", searchStudents);
-
-
+router.get("/all",getAllStudents);
+router.post("/login", loginUser);
+router.post("/createMultiple",createMultipleStudents);
+router.patch("/update", verifyToken, updateStudentProfile);
 
 export default router;
  
