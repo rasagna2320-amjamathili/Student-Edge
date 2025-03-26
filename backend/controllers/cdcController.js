@@ -1,38 +1,32 @@
-import {CDC} from "../models/cdcModel.js";
-//Create a new cdc record
-export const createCDCRecord= async (req, res) => {
-    try {
-        const cdc = new CDC(req.body);
-        await cdc.save();
-        res.status(201).json(cdc);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
+import { CDC } from "../models/cdcModel.js"; 
 
-//  Get all cdc records
-export const getAllCDCRecords =  async (req, res) => {
+export const registerCDC = async (req, res) => {
     try {
-        const cdcRecords = await CDC.find();
-        res.json(cdcRecords);
+        const { name, email, password } = req.body;
+
+        // Ensure all fields are provided
+        if (!name || !email || !password) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
+
+        // Check if email is valid
+        if (!email.endsWith("@cbit.org.in")) {
+            return res.status(400).json({ error: "Only @cbit.org.in emails are allowed." });
+        }
+
+        // Check if CDC account already exists
+        const existingCDC = await CDC.findOne({ email });
+        if (existingCDC) {
+            return res.status(400).json({ error: "CDC account already exists with this email." });
+        }
+
+        // Create and save CDC account
+        const newCDC = new CDC({ name, email, password });
+        await newCDC.save();
+
+        res.status(201).json({ message: "CDC account created successfully", cdc: { name, email } });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
-
-//updateCDCRecord
-export const updateCDCRecord = async (req, res) => {
-    try {
-        if (!req.params.id) return res.status(400).json({ success: false, message: "ID is required" });
-
-        const updatedRecord = await CDC.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedRecord) return res.status(404).json({ success: false, message: "Record not found" });
-
-        res.status(200).json({ success: true, data: updatedRecord });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-
-
