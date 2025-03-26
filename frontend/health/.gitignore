@@ -1,0 +1,11 @@
+# Ignore dependencies
+node_modules/
+.vscode/
+.DS_Store
+
+# Build files
+dist/
+.vite/
+
+# Environment variables
+.env

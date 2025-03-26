@@ -1,0 +1,101 @@
+/* Full-screen container with a dark blue to greenish gradient and subtle pattern */
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* Dark blue to greenish */
+  background-image: url("https://www.transparenttextures.com/patterns/asfalt-light.png"); /* Subtle texture */
+  background-size: 150px 150px;
+  background-blend-mode: overlay;
+}
+
+/* Profile Card Styling - Increased Size */
+.profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px; /* Increased padding */
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  width: 500px; /* Increased width */
+  text-align: center;
+}
+
+/* Profile Picture Placeholder */
+.photo-section {
+  width: 120px;
+  height: 120px;
+  background: #3a6073; /* Dark blue shade */
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Form Heading (Skills, Certifications, etc.) - Darker for visibility */
+.form-container h2 {
+  text-align: center;
+  color: #0b3d91; /* Deep blue for contrast */
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Labels - Now Darker for Better Visibility */
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+  color: #0b3d91; /* Deep blue for strong visibility */
+  font-size: 16px;
+}
+
+/* Input Fields */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border: 1px solid #aacfd0;
+  border-radius: 8px;
+  background: #f0f4f8;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1abc9c;
+  background: #e3f2fd;
+}
+
+/* Buttons */
+.add-field-btn, .submit-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Add Field Button */
+.add-field-btn {
+  background-color: #1abc9c; /* Greenish tint */
+  color: white;
+}
+
+.add-field-btn:hover {
+  background-color: #148f77;
+}
+
+/* Submit Button */
+.submit-btn {
+  background-color: #2c3e50; /* Dark Blue */
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #1a252f;
+}
