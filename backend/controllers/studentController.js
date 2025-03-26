@@ -167,4 +167,18 @@ export const updateStudentProfile = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+//View student profile
+export const getStudentProfile = async (req, res) => {
+    try {
+        const studentId = req.user.id; // Extracted from token in authMiddleware
 
+        const student = await Student.findById(studentId).select("-password"); // Exclude password
+        if (!student) {
+            return res.status(404).json({ error: "Student not found." });
+        }
+
+        res.status(200).json(student);
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};
