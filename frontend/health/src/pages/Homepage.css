@@ -1,0 +1,81 @@
+.home-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: url('https://i.imgur.com/XMz9LD7.png') no-repeat center center fixed; /* Add Background Image */
+  background-size: cover;
+  position: relative;
+}
+
+/* Dark overlay for better text contrast */
+.home-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent dark overlay */
+}
+
+/* Card to highlight text */
+.home-card {
+  background: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 800px;
+  color: white;
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2); /* Light glow */
+  position: relative; /* Ensures it is above the overlay */
+  z-index: 2;
+}
+
+/* Glowy text */
+.home-title {
+  font-size: 3rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.8);
+}
+
+.home-text {
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.8);
+}
+
+/* Buttons */
+.button-blue, .button-green {
+  font-size: 1.2rem !important;
+  padding: 12px 24px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease-in-out !important;
+  font-weight: bold !important;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  display: inline-block !important;
+  text-align: center !important;
+  background-size: 200% auto !important; /* Smooth gradient animation */
+}
+
+/* Bright Blue Gradient */
+.button-blue {
+  background: linear-gradient(45deg, #6dd5fa, #2980b9) !important;
+  color: white !important;
+}
+
+/* Bright Green Gradient */
+.button-green {
+  background: linear-gradient(45deg, #96e6a1, #11998e) !important;
+  color: white !important;
+}
+
+/* Hover Effects */
+.button-blue:hover, .button-green:hover {
+  background-position: right center !important;
+  transform: scale(1.05) !important;
+}
