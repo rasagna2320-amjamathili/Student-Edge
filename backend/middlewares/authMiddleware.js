@@ -17,13 +17,13 @@ export const loginUser = async (req, res) => {
     try {
         console.log("Raw Request Body:", req.body); // Debugging
 
-        const { roll_no, password } = req.body;
+        const { rollNo, password } = req.body;
 
-        if (!roll_no || !password) {
+        if (!rollNo || !password) {
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        const user = await Student.findOne({ roll_no });
+        const user = await Student.findOne({ rollNo });
 
         if (!user) {
             return res.status(401).json({ error: "Invalid roll number or password." });
@@ -45,11 +45,11 @@ export const loginUser = async (req, res) => {
         }
 
         // Ensure JWT payload is correctly formed
-        if (!user._id || !user.roll_no) {
+        if (!user._id || !user.rollNo) {
             return res.status(500).json({ error: "Invalid user data for token generation." });
         }
 
-        const token = jwt.sign({ id: user._id, roll_no: user.roll_no }, SECRET_KEY, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user._id, rollNo: user.rollNo }, SECRET_KEY, { expiresIn: "1h" });
 
 
         res.json({ token });
