@@ -1,0 +1,105 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: 
+     
+    linear-gradient(to right, #1a2a6c, #1e5799, #2989d8);
+  background-size: auto, cover; /* First 'auto' for pattern, second 'cover' for gradient */
+  background-attachment: fixed;
+  background-blend-mode: normal; /* Ensures pattern remains visible */
+}
+
+
+/* Center login box */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+
+/* Login Box */
+.login-box {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 420px;
+}
+
+/* Title */
+h2 {
+  color: #222;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input Fields */
+input {
+  padding: 14px;
+  margin: 10px 0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #f8f8f8;
+  transition: 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1e5799;
+  background: #e0e0e0;
+}
+
+/* Login Button */
+/* Login Button */
+button {
+  padding: 14px;
+  background: #1e5799 !important; /* Ensures the button stays blue */
+  color: white !important; /* Ensures text stays white */
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+/* Ensure visibility when button is disabled */
+button:disabled {
+  background: #1e5799 !important;
+  opacity: 0.8 !important;
+  cursor: not-allowed;
+}
+
+
+button:hover {
+  background: #123a6d;
+}
+
+ 
+
+/* Forgot Password Link */
+a {
+  display: block;
+  margin-top: 12px;
+  color: #1e5799;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  color: #123a6d;
+  text-decoration: underline;
+}
