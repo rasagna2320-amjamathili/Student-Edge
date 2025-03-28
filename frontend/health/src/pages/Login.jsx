@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
 
-const BASE_URL = "http://172.16.4.89:5000"; // Backend IP
+const BASE_URL = "http://localhost:5000"; // Backend base URL
 
 const Login = () => {
   const [rollNo, setRollNo] = useState("");
@@ -15,19 +15,49 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (!rollNo.trim() || !password.trim()) {
+      alert("Roll No and Password are required.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await axios.post(`${BASE_URL}/login`, { rollNo, password, role: "student" });
+      console.log("Sending login request...");
+
+      // 🔹 Send login request
+      const res = await axios.post(`${BASE_URL}/api/students/login`, {
+        rollNo: rollNo.trim(),
+        password: password.trim(),
+      });
+
+      console.log("Login Response:", res.data);
+
+      if (!res?.data?.token) {
+        alert("Invalid credentials.");
+        setLoading(false);
+        return;
+      }
+
+      // 🔹 Store token
       localStorage.setItem("token", res.data.token);
 
-      // Fetch Student Data
-      const studentRes = await axios.get(`${BASE_URL}/api/student-profile`, {
-        headers: { Authorization: `Bearer ${res.data.token}` }
+      console.log("Fetching student profile...");
+      
+      // 🔹 Fetch student profile
+      const studentRes = await axios.get(`${BASE_URL}/api/students/profile`, {
+        headers: { Authorization: `Bearer ${res.data.token}` },
       });
-      console.log(studentRes.data); // Handle student data here
 
-      navigate("/dashboard");
+      console.log("Student Profile Response:", studentRes.data);
+
+      // 🔹 Store user details
+      localStorage.setItem("user", JSON.stringify(studentRes.data));
+
+      // 🔹 Redirect to student home
+      navigate("/student-home");
     } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
+      console.error("Login Error:", error.response?.data);
+      alert(error.response?.data?.error || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -38,12 +68,23 @@ const Login = () => {
       <div className="login-box">
         <h2>Student Login</h2>
         <form onSubmit={handleLogin}>
-          <input type="text" placeholder="Roll No" value={rollNo} onChange={(e) => setRollNo(e.target.value)} required />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="submit" disabled={loading} style={{ color: "white" }}>
-  {loading ? "Logging in..." : "Login"}
-</button>
-
+          <input
+            type="text"
+            placeholder="Roll No"
+            value={rollNo}
+            onChange={(e) => setRollNo(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
         <a href="/forgot-password">Forgot Password?</a>
       </div>
