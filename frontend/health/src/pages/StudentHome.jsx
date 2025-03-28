@@ -1,8 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./StudentHome.css";
 
 const StudentHome = () => {
+  const [student, setStudent] = useState(null);
   const [additionalFields, setAdditionalFields] = useState([""]);
+  console.log("Student State:", student);
+
+
+  useEffect(() => {
+    // 🔹 Retrieve student details from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setStudent(JSON.parse(storedUser));
+    }
+  }, []);
 
   const handleAddField = () => {
     setAdditionalFields([...additionalFields, ""]);
@@ -14,6 +25,17 @@ const StudentHome = () => {
         <div className="photo-section">Photo</div>
         <div className="form-container">
           <h2>Student Profile</h2>
+
+          {student ? (
+            <>
+              <p><strong>Name:</strong> {student.name}</p>
+              <p><strong>Roll No:</strong> {student.roll_no}</p>
+              <p><strong>Email:</strong> {student.email}</p>
+            </>
+          ) : (
+            <p>Loading student details...</p>
+          )}
+
           <form>
             <label>Skills</label>
             <input type="text" />
@@ -46,5 +68,6 @@ const StudentHome = () => {
   );
 };
 
-export default StudentHome; // ✅ Ensure correct export
+export default StudentHome;
+
 
