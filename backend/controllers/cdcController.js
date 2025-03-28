@@ -1,4 +1,7 @@
 import { CDC } from "../models/cdcModel.js"; 
+import bcrypt from 'bcrypt'; 
+import jwt from 'jsonwebtoken'; 
+
 
 export const registerCDC = async (req, res) => {
     try {
@@ -30,3 +33,40 @@ export const registerCDC = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+export const loginCDC = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      // Validate input
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required." });
+      }
+  
+      // Check if CDC user exists
+      const cdcUser = await CDC.findOne({ email });
+      if (!cdcUser) {
+        return res.status(400).json({ error: "User not found." });
+      }
+  
+      // Check if password matches
+      const isMatch = await bcrypt.compare(password, cdcUser.password);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Invalid password." });
+      }
+  
+      // Generate JWT token
+      const token = jwt.sign({ userId: cdcUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+  
+      // Return token in response
+      res.status(200).json({
+        success: true,
+        token,
+        message: "Login successful!",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
