@@ -1,18 +1,26 @@
 import express from "express";
-import mongoose, { get } from "mongoose";
-import {createAStudent,searchStudents, updateStudentProfile, createMultipleStudents, getAllStudents, getStudentProfile} from "../Controllers/studentController.js";
-import {loginUser,verifyToken} from "../middlewares/authMiddleware.js";  // Import the middleware
+import { 
+  createAStudent,
+  searchStudents,
+  updateStudentProfile,
+  createMultipleStudents,
+  getAllStudents,
+  getStudentProfile
+} from "../Controllers/studentController.js";
+
+import { loginUser, verifyToken } from "../middlewares/authMiddleware.js"; 
 
 const router = express.Router();
 
-
-router.post("/create",createAStudent);
+// Student Routes
+router.post("/create", createAStudent);
 router.get("/search", searchStudents);
-router.get("/all",getAllStudents);
-router.post("/login", loginUser);
-router.post("/createMultiple",createMultipleStudents);
+router.get("/all", getAllStudents);
+router.post("/login", loginUser);  // Ensure this is correctly handled in controller
+router.post("/createMultiple", createMultipleStudents);
 router.patch("/update", verifyToken, updateStudentProfile);
 router.get("/profile", verifyToken, getStudentProfile);
 
 export default router;
+
  
