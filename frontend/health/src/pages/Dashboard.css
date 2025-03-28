@@ -1,7 +1,7 @@
 /* General Styles */
 body {
   font-family: "Poppins", sans-serif;
-  background: #f5f7fa;
+  background: linear-gradient(135deg, #f5f7fa, #dbe9f6);
   margin: 0;
   padding: 0;
   color: #333;
@@ -9,7 +9,7 @@ body {
 
 /* Dashboard Container */
 .dashboard-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: auto;
   padding: 20px;
 }
@@ -22,74 +22,96 @@ body {
   margin-bottom: 20px;
 }
 
-/* Search Bar */
-.search-bar {
+/* Filters Section */
+.filters {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 15px;
   margin-bottom: 20px;
+  align-items: center;
 }
 
-.search-bar input {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
+
+
+.filters select {
+  padding: 14px;
+  border: 2px solid #bbb;
+  border-radius: 10px;
   outline: none;
-  font-size: 16px;
+  font-size: 18px;
+  background: white;
+  color: #333;
+  min-width: 170px;
+  cursor: pointer;
+  transition: border-color 0.3s;
 }
 
-.search-bar button {
-  padding: 12px 20px;
+.filters input {
+  flex: 1;
+  min-width: 300px; /* Increased width */
+  padding: 14px; /* Increased padding */
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  font-size: 18px; /* Larger font size */
+}
+
+.filters button {
+  padding: 14px 25px; /* Increased padding */
+  font-size: 18px; /* Larger font size */
   background: #28a745;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s, transform 0.2s;
 }
 
-.search-bar button:hover {
+.filters button:hover {
   background: #218838;
+  transform: scale(1.05); /* Slight enlargement on hover */
 }
 
 /* Student Grid */
 .student-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 25px;
   margin-top: 20px;
 }
 
 /* Student Card */
 .student-card {
   background: white;
-  padding: 20px;
+  padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+  border: 1px solid #ccc;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .student-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-6px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.18);
 }
 
 .student-name {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   color: #2c3e50;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .student-email {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 12px;
 }
 
 .student-detail {
-  font-size: 14px;
+  font-size: 15px;
+  margin: 6px 0;
   color: #444;
 }
 
@@ -97,47 +119,105 @@ body {
 .tag-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .tag {
   background: #f0f0f0;
   color: #333;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
   display: inline-block;
+}
+
+.course-tag {
+  background: #e7f3ff;
+  color: #007bff;
+}
+
+.cert-tag {
+  background: #e6ffe6;
+  color: #28a745;
+}
+
+.skill-tag {
+  background: #fff3e6;
+  color: #fd7e14;
 }
 
 /* No Students Message */
 .no-students {
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
   color: #777;
   margin-top: 20px;
 }
-.suggestions {
-  margin-top: 10px;
-  background: #f8f9fa;
+
+/* Loading and Error Messages */
+.loading,
+.error-message {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.loading {
+  color: #28a745;
+}
+
+.error-message {
+  color: #dc3545;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Space between input and button */
+  margin: 20px 0;
+}
+
+.search-bar input {
+  width: 400px; /* Increase width */
+  height: 50px; /* Increase height */
   padding: 10px;
-  border-radius: 5px;
+  font-size: 18px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  outline: none;
 }
 
-.suggestions ul {
-  list-style: none;
-  padding: 0;
-  margin: 5px 0 0 0;
-}
-
-.suggestion {
-  display: block;
-  padding: 5px 10px;
+.search-bar button {
+  height: 50px;
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  border-radius: 3px;
+  transition: background 0.3s ease, transform 0.2s;
 }
 
-.suggestion:hover {
-  background-color: #e9ecef;
+.search-bar button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+.download-btn {
+  margin: 10px 0;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.download-btn:hover {
+  background-color: #218838;
 }
