@@ -202,15 +202,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 import StudentCard from "./StudentCard";
+import { CSVLink } from "react-csv";
 
 const students = [
   {
     name: "John Doe",
     rollNo: "CSE2201",
     email: "john@example.com",
-    password: "securePass123", // This should be securely stored in real apps
+    password: "securePass123",
     branch: "CSE",
     section: "CSE-2",
+    gpa: 8.5,
     courses: ["Artificial Intelligence", "Machine Learning Fundamentals"],
     certificates: ["AWS Machine Learning Specialist", "Google AI Professional"],
     skills: ["Python", "TensorFlow", "PyTorch"],
@@ -222,6 +224,7 @@ const students = [
     password: "dataScience123",
     branch: "IT",
     section: "IT-1",
+    gpa: 9.0,
     courses: ["Data Science Fundamentals", "Machine Learning and Deep Learning"],
     certificates: ["IBM Data Science Professional", "Machine Learning by Coursera"],
     skills: ["R", "SQL", "Pandas", "Machine Learning"],
@@ -231,31 +234,32 @@ const students = [
 const API_BASE = "http://localhost:5000";
 
 const abbreviationMap = {
-  'ds': ['data science'],
-  'ml': ['machine learning'],
-  'ai': ['artificial intelligence'],
-  'bd': ['big data'],
+  ds: ["data science"],
+  ml: ["machine learning"],
+  ai: ["artificial intelligence"],
+  bd: ["big data"],
 };
 
 export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [filteredStudents, setFilteredStudents] = useState(students);
+  const [branchFilter, setBranchFilter] = useState("");
+  const [sectionFilter, setSectionFilter] = useState("");
+  const [skillFilter, setSkillFilter] = useState("");
+  const [gpaFilter, setGpaFilter] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [geminiStatus, setGeminiStatus] = useState(null);
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [geminiStatus, setGeminiStatus] = useState("Checking...");
+
   const navigate = useNavigate();
 
-  // Search function
   useEffect(() => {
-    if (!search.trim()) {
-      setFilteredStudents(students);
-      return;
-    }
+    let filtered = students;
 
-    const searchTerm = search.toLowerCase();
-    setFilteredStudents(
-      students.filter((student) => {
+    if (search.trim()) {
+      const searchTerm = search.toLowerCase();
+      filtered = filtered.filter((student) => {
         const searchFields = [
           student.name,
           student.rollNo,
@@ -264,38 +268,34 @@ export default function Dashboard() {
           student.section,
           ...student.courses,
           ...student.certificates,
-          ...student.skills
-        ].map(f => f.toLowerCase());
+          ...student.skills,
+        ].map((f) => f.toLowerCase());
 
-        const hasDirectMatch = searchFields.some(field => 
-          field.includes(searchTerm)
-        );
-
+        const hasDirectMatch = searchFields.some((field) => field.includes(searchTerm));
         const abbreviationMatches = abbreviationMap[searchTerm] || [];
-        const hasAbbrevMatch = abbreviationMatches.some(term => 
-          searchFields.some(field => field.includes(term))
+        const hasAbbrevMatch = abbreviationMatches.some((term) =>
+          searchFields.some((field) => field.includes(term))
         );
-
         return hasDirectMatch || hasAbbrevMatch;
-      })
-    );
-  }, [search]);
+      });
+    }
 
-  // Check Gemini AI Status
-  useEffect(() => {
-    const checkGemini = async () => {
-      try {
-        const response = await axios.get(`${API_BASE}/gemini-status`);
-        setGeminiStatus(response.data.connected);
-      } catch (error) {
-        console.error("Error checking Gemini status:", error);
-        setGeminiStatus(false);
-      }
-    };
-    checkGemini();
-  }, []);
+    if (branchFilter) {
+      filtered = filtered.filter((student) => student.branch === branchFilter);
+    }
+    if (sectionFilter) {
+      filtered = filtered.filter((student) => student.section === sectionFilter);
+    }
+    if (skillFilter) {
+      filtered = filtered.filter((student) => student.skills.includes(skillFilter));
+    }
+    if (gpaFilter) {
+      filtered = filtered.filter((student) => student.gpa >= parseFloat(gpaFilter));
+    }
 
-  // Fetch search suggestions
+    setFilteredStudents(filtered);
+  }, [search, branchFilter, sectionFilter, skillFilter, gpaFilter]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (search.trim()) {
@@ -312,7 +312,23 @@ export default function Dashboard() {
     setIsLoading(true);
     try {
       const response = await axios.post(`${API_BASE}/search`, { query: search });
-      setSuggestions(response.data?.improved_queries || []);
+      let fetchedSuggestions = response.data?.improved_queries || [];
+
+      const relevantSuggestions = fetchedSuggestions.filter((suggestion) =>
+        students.some((student) =>
+          [
+            student.name,
+            student.rollNo,
+            student.branch,
+            student.section,
+            ...student.courses,
+            ...student.certificates,
+            ...student.skills,
+          ].some((field) => field.toLowerCase().includes(suggestion.toLowerCase()))
+        )
+      );
+
+      setSuggestions(relevantSuggestions);
       setError(null);
     } catch (error) {
       console.error("Error fetching suggestions:", error);
@@ -322,65 +338,85 @@ export default function Dashboard() {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setSearch(suggestion);
-    setSuggestions([]);
+  const checkGeminiConnection = async () => {
+    try {
+      const response = await axios.get(`${API_BASE}/gemini-status`);
+      setGeminiStatus(response.data.status || "Connected");
+    } catch (error) {
+      setGeminiStatus("Not Connected");
+      console.error("Gemini API error:", error);
+    }
   };
+
+  useEffect(() => {
+    checkGeminiConnection();
+  }, []);
 
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">CDC Student Search</h1>
-      <div className="gemini-status">
-        <strong>Gemini AI Status: </strong>
-        <span className={`status-indicator ${geminiStatus ? "connected" : "disconnected"}`}>
-          {geminiStatus === null ? "Checking..." : geminiStatus ? "Connected" : "Not Connected"}
-        </span>
+      <p>Gemini Status: {geminiStatus}</p>
+      <div className="filters">
+        <select onChange={(e) => setBranchFilter(e.target.value)}>
+          <option value="">All Branches</option>
+          <option value="CSE">CSE</option>
+          <option value="IT">IT</option>
+        </select>
+        <select onChange={(e) => setSectionFilter(e.target.value)}>
+          <option value="">All Sections</option>
+          <option value="CSE-2">CSE-2</option>
+          <option value="IT-1">IT-1</option>
+        </select>
+        <select onChange={(e) => setSkillFilter(e.target.value)}>
+          <option value="">All Skills</option>
+          <option value="Python">Python</option>
+          <option value="TensorFlow">TensorFlow</option>
+          <option value="R">R</option>
+        </select>
+        <input
+          type="number"
+          placeholder="Min GPA"
+          onChange={(e) => setGpaFilter(e.target.value)}
+        />
       </div>
-
       <div className="search-bar">
         <input
           type="text"
           placeholder="🔍 Search students..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          onFocus={() => search.trim() && fetchSuggestions()}
         />
         <button onClick={() => setSearch(search)}>Search</button>
- 
-
+        <CSVLink
+          data={filteredStudents.map(({ rollNo, name, gpa }) => ({
+            RollNo: rollNo,
+            Name: name,
+            GPA: gpa,
+          }))}
+          filename="students.csv"
+        >
+          <button>Download CSV</button>
+        </CSVLink>
       </div>
-
-      {error && <div className="error-message">{error}</div>}
-      {isLoading && <div className="loading">Loading suggestions...</div>}
-
+      {isLoading && <p>Loading suggestions...</p>}
+      {error && <p className="error">{error}</p>}
       {suggestions.length > 0 && (
         <div className="suggestions">
-          <strong>Suggestions:</strong>
+          <p>Suggestions:</p>
           <ul>
-            {suggestions.map((suggestion, i) => (
-              <li 
-                key={i} 
-                className="suggestion" 
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                {suggestion}
-              </li>
+            {suggestions.map((s, i) => (
+              <li key={i}>{s}</li>
             ))}
           </ul>
         </div>
       )}
-
       <div className="student-grid">
         {filteredStudents.length > 0 ? (
           filteredStudents.map((student, index) => (
             <StudentCard key={index} student={student} />
           ))
         ) : (
-          <p className="no-students">
-            {search.trim() 
-              ? `No students found matching "${search}". Try a different search term.` 
-              : "No students to display. Use the search bar to find students."}
-          </p>
+          <p className="no-students">No students found.</p>
         )}
       </div>
     </div>
