@@ -16,14 +16,14 @@ const CdcLogin = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/cdc-login", {
+      const response = await axios.post("http://localhost:5000/api/cdcs/loginCDC", {
         email,
         password,
       });
 
       if (response.data.success) {
         localStorage.setItem("cdcToken", response.data.token);
-        navigate("/cdc-dashboard");
+        navigate("/dashboard"); // Navigate to dashboard on successful login
       } else {
         setError(response.data.message);
       }
@@ -59,7 +59,7 @@ const CdcLogin = () => {
             required
           />
           
-          {/* 🔥 Button disabled until form is valid */}
+          {/* Button disabled until form is valid */}
           <button type="submit" disabled={!isFormValid || loading} className={isFormValid ? "active" : "disabled"}>
             {loading ? "Logging in..." : "Login"}
           </button>
