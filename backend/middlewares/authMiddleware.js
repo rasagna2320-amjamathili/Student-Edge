@@ -15,47 +15,59 @@ if (!SECRET_KEY) {
 // User Login Middleware
 export const loginUser = async (req, res) => {
     try {
-        console.log("Raw Request Body:", req.body); // Debugging
+        console.log("➡️ Received login request");
+        console.log("📩 Raw Request Body:", req.body); // Debugging
 
         const { rollNo, password } = req.body;
 
         if (!rollNo || !password) {
+            console.log("❌ Missing fields");
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        const user = await Student.findOne({ rollNo });
+        console.log("🔎 Searching for user with rollNo:", rollNo);
+        const user = await Student.findOne({
+            $or: [{ rollNo: rollNo }, { roll_no: rollNo }]
+        });
+        
 
         if (!user) {
+            console.log("❌ User not found");
             return res.status(401).json({ error: "Invalid roll number or password." });
         }
 
-        console.log("User Found:", user);
+        console.log("✅ User Found:", user);
 
-        // Ensure password exists before comparing
         if (!user.password) {
+            console.log("❌ User password is missing in the database");
             return res.status(500).json({ error: "User password is missing in the database." });
         }
 
+        console.log("🔑 Comparing passwords...");
         const isMatch = await bcrypt.compare(password, user.password);
-
-        console.log("Password Match:", isMatch);
+        console.log("✅ Password Match:", isMatch);
 
         if (!isMatch) {
+            console.log("❌ Incorrect password");
             return res.status(401).json({ error: "Invalid roll number or password." });
         }
 
-        // Ensure JWT payload is correctly formed
-        if (!user._id || !user.rollNo) {
-            return res.status(500).json({ error: "Invalid user data for token generation." });
-        }
-
+        console.log("🔐 Generating JWT Token...");
         const token = jwt.sign({ id: user._id, rollNo: user.rollNo }, SECRET_KEY, { expiresIn: "1h" });
 
+        console.log("✅ Token Generated:", token);
+        console.log("🚀 Sending Response...");
 
-        res.json({ token });
+        res.json({ token, user });
+
+        console.log("✅ Response Sent Successfully");
     } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).json({ error: "Server error" });
+        console.error("❌ Login Error:", error);
+        res.status(500).json({ 
+            error: "Server error", 
+            details: error.message, 
+            stack: error.stack 
+        });
     }
 };
 
