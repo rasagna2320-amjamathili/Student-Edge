@@ -8,10 +8,9 @@ import mentorRoutes from "./routes/mentorRoutes.js";
 import cdcRoutes from "./routes/cdcRoutes.js";
 import { loginUser } from "./middlewares/authMiddleware.js";
 import bcrypt from 'bcrypt'; // Import bcrypt
+import 'dotenv/config';
 
-
-
-
+console.log("Loaded SECRET_KEY:", process.env.SECRET_KEY);
 
 
 dotenv.config();

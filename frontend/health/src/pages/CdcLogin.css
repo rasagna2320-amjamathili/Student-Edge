@@ -1,30 +1,35 @@
-/* Full-screen container with a light blue gradient and subtle pattern */
+/* CDC Login Page */
 .cdc-login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(to right, #dbeafe, #bfdbfe, #93c5fd); /* Light blue gradient */
-  background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); /* Light, modern pattern */
-  background-size: 200px 200px; /* Adjust size for better visibility */
-  background-blend-mode: overlay;
+  background-color: #EAD7B7 !important; /* Richer Beige */
+  opacity: 0.85 !important;
+  background-size: 20px 20px !important;
+  background-image: repeating-linear-gradient(
+    to right, 
+    #F5E1C8, #F5E1C8 1px, /* Deeper Cream */
+    #D9B999 1px, #D9B999 /* Warm Muted Beige */
+  ) !important;
 }
 
-/* Wider Login Box */
+/* Login Box */
 .cdc-login-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: #FFFDF8;
   padding: 3rem;
   border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(139, 119, 101, 0.15);
   text-align: center;
-  width: 420px;
+  width: 460px;
+  border: 1px solid #E8DECD;
 }
 
-/* Title Styling */
-h2 {
-  color: #1e3a8a;
+/* Title */
+.cdc-login-container h2 {
+  font-size: 28px;
+  color: #8B7355;
   margin-bottom: 1.5rem;
-  font-size: 24px;
   font-weight: bold;
 }
 
@@ -35,106 +40,70 @@ h2 {
   margin-bottom: 10px;
 }
 
-/* Form Styling */
-form {
+/* Form */
+.cdc-login-container form {
   display: flex;
   flex-direction: column;
 }
 
 /* Input Fields */
-input {
-  padding: 14px;
-  margin: 10px 0;
-  border: 2px solid #93c5fd;
-  border-radius: 8px;
-  font-size: 16px;
-  background: #eef2ff; /* Softer bluish-white */
-  transition: 0.3s;
-}
-
-input:focus {
+.cdc-login-container input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 16px;
+  margin-bottom: 1.2rem;
+  border: 2px solid #E0D5C0;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #F5E8D4;
+  color: #3D2C21;
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
   outline: none;
-  border-color: #60a5fa;
-  background: #e0e7ff;
 }
 
-/* Login Button */
-button {
-  padding: 14px;
-  background: #3b82f6;
+/* Animation Effect on Input Focus */
+.cdc-login-container input:focus {
+  border-color: #8B7355;
+  background: #F1E0C8;
+  box-shadow: 0 0 8px rgba(139, 115, 85, 0.3);
+  transform: scale(1.02);
+}
+
+/* Button */
+.cdc-login-container button {
+  width: 100%;
+  height: 52px;
+  padding: 12px 18px;
+  font-size: 16px;
+  background: #8B7355;
   color: white;
-  font-size: 18px;
-  font-weight: bold;
   border: none;
   border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
-  margin-top: 10px;
-}
-button {
-  padding: 12px;
-  width: 100%;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.2s ease-in-out;
 }
 
-button.disabled {
-  background: #ccc;
-  color: #888;
-  cursor: not-allowed;
-}
-
-button.active {
-  background: #007bff;
-  color: white;
-}
-
-button.active:hover {
-  background: #0056b3;
-}
-
-button:hover {
-  background: #2563eb;
+.cdc-login-container button:hover {
+  background: #6B5D4D;
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(139, 119, 101, 0.2);
 }
 
 /* Forgot Password Link */
-.login-links a {
+.cdc-login-container .forgot-link {
   display: block;
-  margin-top: 12px;
-  color: #3b82f6;
+  margin-top: 1.2rem;
+  font-size: 16px;
+  font-weight: 600;
+  color: #8B7355;
   text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s;
+  transition: color 0.3s ease-in-out, transform 0.2s;
 }
 
-.login-links a:hover {
-  color: #2563eb;
+.cdc-login-container .forgot-link:hover {
+  color: #5A4A3A;
   text-decoration: underline;
+  transform: scale(1.05);
 }
-.login-btn {
-  padding: 12px;
-  width: 100%;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.login-btn.disabled {
-  background: #ccc;  /* 🔴 Greyed out */
-  color: #888;
-  cursor: not-allowed;
-}
-
-.login-btn.active {
-  background: #007bff; /* 🔵 Blue when enabled */
-  color: white;
-}
-
-.login-btn.active:hover {
-  background: #0056b3;
-}
-
-
