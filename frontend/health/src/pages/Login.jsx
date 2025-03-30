@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
 
-const BASE_URL = "http://localhost:5000"; // Backend base URL
+const BASE_URL = "http://localhost:5000";
 
 const Login = () => {
   const [rollNo, setRollNo] = useState("");
@@ -22,15 +22,10 @@ const Login = () => {
     }
 
     try {
-      console.log("Sending login request...");
-
-      // 🔹 Send login request
       const res = await axios.post(`${BASE_URL}/api/students/login`, {
         rollNo: rollNo.trim(),
         password: password.trim(),
       });
-
-      console.log("Login Response:", res.data);
 
       if (!res?.data?.token) {
         alert("Invalid credentials.");
@@ -38,25 +33,15 @@ const Login = () => {
         return;
       }
 
-      // 🔹 Store token
       localStorage.setItem("token", res.data.token);
-
-      console.log("Fetching student profile...");
       
-      // 🔹 Fetch student profile
       const studentRes = await axios.get(`${BASE_URL}/api/students/profile`, {
         headers: { Authorization: `Bearer ${res.data.token}` },
       });
 
-      console.log("Student Profile Response:", studentRes.data);
-
-      // 🔹 Store user details
       localStorage.setItem("user", JSON.stringify(studentRes.data));
-
-      // 🔹 Redirect to student home
-      navigate("/student-home");
+      navigate("/student-profile");
     } catch (error) {
-      console.error("Login Error:", error.response?.data);
       alert(error.response?.data?.error || "Login failed.");
     } finally {
       setLoading(false);
@@ -86,7 +71,9 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        <a href="/forgot-password">Forgot Password?</a>
+        <a href="/forgot-password" className="forgot-link">
+          Forgot Password?
+        </a>
       </div>
     </div>
   );

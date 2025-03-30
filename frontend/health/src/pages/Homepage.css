@@ -1,81 +1,171 @@
-.home-container {
-  min-height: 100vh;
+:root {
+  --primary: #8b5a2b; /* Warm earthy tone */
+  --primary-dark: #6d4220;
+  --secondary: #a06b39;
+  --dark: #3d2c21;
+  --light: #f8f9fa;
+  --gray: #5a4435; /* Muted brown */
+  --white: #ffffff;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+body, .app-container {
+  margin: 0;
+  padding: 0;
+  font-family: 'Merriweather', serif; /* More elegant typography */
+  height: 100vh;
   width: 100vw;
+  overflow: hidden;
+  background: url("https://i.imgur.com/mZYGHzj.png") no-repeat center center fixed;
+  background-size: cover;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: url('https://i.imgur.com/XMz9LD7.png') no-repeat center center fixed; /* Add Background Image */
-  background-size: cover;
-  position: relative;
 }
 
-/* Dark overlay for better text contrast */
-.home-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent dark overlay */
+/* Hide Header and Footer */
+.app-header, .app-footer {
+  display: none;
 }
 
-/* Card to highlight text */
-.home-card {
-  background: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
-  padding: 30px;
-  border-radius: 10px;
-  text-align: center;
+/* Hero Section */
+.hero-section {
   max-width: 800px;
-  color: white;
-  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2); /* Light glow */
-  position: relative; /* Ensures it is above the overlay */
-  z-index: 2;
+  margin: auto;
+  text-align: center;
 }
 
-/* Glowy text */
-.home-title {
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Title Styling */
+.hero-content h1 {
   font-size: 3rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.8);
+  font-weight: 700;
+  color: var(--dark);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.home-text {
-  font-size: 1.5rem;
-  text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.8);
+/* Description Styling */
+.hero-description {
+  font-size: 1.6rem; /* Slightly smaller for a cute feel */
+  color: #ffffff; /* White for contrast */
+  font-weight: 600; /* Bold but not too heavy */
+  line-height: 1.6; /* Less gap between lines */
+  padding: 1.8rem 3rem; /* Balanced padding */
+  max-width: 800px; /* Slightly narrower for compact look */
+  text-align: center;
+  font-family: 'Quicksand', sans-serif; /* Soft, friendly font */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Soft shadow */
+  border-radius: 12px; /* Rounded edges */
+  background: rgba(0, 0, 0, 0.3); /* Slightly transparent background */
+  backdrop-filter: blur(5px); /* Blurred glass effect */
 }
 
-/* Buttons */
-.button-blue, .button-green {
-  font-size: 1.2rem !important;
-  padding: 12px 24px !important;
-  border: none !important;
-  border-radius: 8px !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease-in-out !important;
-  font-weight: bold !important;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  display: inline-block !important;
-  text-align: center !important;
-  background-size: 200% auto !important; /* Smooth gradient animation */
+
+
+/* Button Section */
+/* Button Section */
+.auth-buttons {
+  display: flex;
+  gap: 0.8rem; /* Closer spacing for cuteness */
+  margin-top: 1.2rem;
+  justify-content: center;
 }
 
-/* Bright Blue Gradient */
-.button-blue {
-  background: linear-gradient(45deg, #6dd5fa, #2980b9) !important;
-  color: white !important;
+/* Base Button Styles */
+.auth-button {
+  padding: 0.6rem 1.4rem; /* Smaller padding */
+  border-radius: 20px; /* Soft round edges */
+  font-weight: 600;
+  font-size: 1rem; /* Smaller font */
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px; /* Small & compact */
+  border: none;
+  outline: none;
+  cursor: pointer;
+  letter-spacing: 0.5px;
 }
 
-/* Bright Green Gradient */
-.button-green {
-  background: linear-gradient(45deg, #96e6a1, #11998e) !important;
-  color: white !important;
+/* Student Button */
+.auth-button.student {
+  background: #a06b39;
+  color: var(--white);
 }
 
-/* Hover Effects */
-.button-blue:hover, .button-green:hover {
-  background-position: right center !important;
-  transform: scale(1.05) !important;
+/* Hover Effect */
+.auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Student Button Hover */
+.auth-button.student:hover {
+  background: #8b5a2b;
+}
+
+/* CDC Login Button */
+.auth-button.cdc {
+  background: #c0844d;
+  color: var(--white);
+}
+
+/* CDC Button Hover */
+.auth-button.cdc:hover {
+  background: #a06b39;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-buttons {
+    flex-direction: column;
+  }
+.auth-button {
+  min-width: 260px; /* Increased width */
+  max-width: 300px; /* Slightly longer */
+  padding: 0.6rem 1.8rem; /* Reduced height */
+  border-radius: 10px; /* Soft edges */
+  font-size: 1rem; /* Adjusted font size */
+}
+
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Smooth Fade-in Effect */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
