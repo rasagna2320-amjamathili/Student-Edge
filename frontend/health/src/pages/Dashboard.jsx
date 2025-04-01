@@ -197,142 +197,160 @@ export default function Dashboard() {
   );
 }
 */
+
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 import StudentCard from "./StudentCard";
 import { CSVLink } from "react-csv";
 
-const students = [
-  {
-    name: "John Doe",
-    rollNo: "CSE2201",
-    email: "john@example.com",
-    password: "securePass123",
-    branch: "CSE",
-    section: "CSE-2",
-    gpa: 8.5,
-    courses: ["Artificial Intelligence", "Machine Learning Fundamentals"],
-    certificates: ["AWS Machine Learning Specialist", "Google AI Professional"],
-    skills: ["Python", "TensorFlow", "PyTorch"],
-  },
-  {
-    name: "Jane Smith",
-    rollNo: "IT2203",
-    email: "jane@example.com",
-    password: "dataScience123",
-    branch: "IT",
-    section: "IT-1",
-    gpa: 9.0,
-    courses: ["Data Science Fundamentals", "Machine Learning and Deep Learning"],
-    certificates: ["IBM Data Science Professional", "Machine Learning by Coursera"],
-    skills: ["R", "SQL", "Pandas", "Machine Learning"],
-  },
-];
-
-const API_BASE = "http://localhost:5000";
-
-const abbreviationMap = {
-  ds: ["data science"],
-  ml: ["machine learning"],
-  ai: ["artificial intelligence"],
-  bd: ["big data"],
-};
+const API_BASE = "http://192.168.0.196:5000";
 
 export default function Dashboard() {
   const [search, setSearch] = useState("");
-  const [filteredStudents, setFilteredStudents] = useState(students);
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [branchFilter, setBranchFilter] = useState("");
   const [sectionFilter, setSectionFilter] = useState("");
-  const [skillFilter, setSkillFilter] = useState("");
+  const [yearFilter, setYearFilter] = useState("");
   const [gpaFilter, setGpaFilter] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [geminiStatus, setGeminiStatus] = useState("Checking...");
+  const [suggestions, setSuggestions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchTerms, setSearchTerms] = useState([]);
 
-  const navigate = useNavigate();
-
+  // Fetch students and check Gemini status on mount
   useEffect(() => {
-    let filtered = students;
+    fetchStudents();
+    checkGeminiConnection();
+  }, []);
 
-    if (search.trim()) {
-      const searchTerm = search.toLowerCase();
-      filtered = filtered.filter((student) => {
-        const searchFields = [
-          student.name,
-          student.rollNo,
-          student.email,
-          student.branch,
-          student.section,
-          ...student.courses,
-          ...student.certificates,
-          ...student.skills,
-        ].map((f) => f.toLowerCase());
+  // Clear search terms when search is empty
+  useEffect(() => {
+    if (!search.trim()) {
+      setSearchTerms([]);
+    }
+  }, [search]);
 
-        const hasDirectMatch = searchFields.some((field) => field.includes(searchTerm));
-        const abbreviationMatches = abbreviationMap[searchTerm] || [];
-        const hasAbbrevMatch = abbreviationMatches.some((term) =>
-          searchFields.some((field) => field.includes(term))
-        );
-        return hasDirectMatch || hasAbbrevMatch;
+  // Apply all filters whenever dependencies change
+  useEffect(() => {
+    let filtered = [...students];
+
+    // Debug: Log sample student data
+    if (filtered.length > 0) {
+      console.log("Sample student data:", {
+        roll_no: filtered[0].roll_no,
+        branchCode: filtered[0].roll_no.slice(6, 9),
+        yearDigits: filtered[0].roll_no.slice(5, 7),
+        sectionIndicator: filtered[0].roll_no.slice(9, 12),
       });
     }
 
+    // Enhanced search filter (searches both original terms and suggestions)
+    if (search.trim() || searchTerms.length > 0) {
+      const searchTerm = search.toLowerCase();
+      const lowerSuggestions = suggestions.map(s => s.toLowerCase());
+      
+      filtered = filtered.filter((student) => {
+        const searchFields = [
+          ...(student.skills || []),
+          ...(student.certifications || []),
+          ...(student.participatedTechEvents || []),
+          ...(student.extraCurricularActivities || []),
+          ...(student.coCurricularActivities || []),
+          ...(student.additionalFields || [])
+        ];
+
+        // Combine all terms we want to search for
+        const allSearchTerms = [
+          searchTerm,
+          ...searchTerms,
+          ...lowerSuggestions
+        ].filter(term => term.trim() !== '');
+
+        return searchFields.some((field) => {
+          const lowerField = String(field).toLowerCase();
+          return allSearchTerms.some(term => lowerField.includes(term));
+        });
+      });
+    }
+
+    // Branch filter (digits 7-9 in 0-based index = positions 7-9 in roll number)
     if (branchFilter) {
-      filtered = filtered.filter((student) => student.branch === branchFilter);
+      filtered = filtered.filter((student) => {
+        const branchCode = student.roll_no.slice(6, 9);
+        const branchMap = {
+          "737": "IT",
+          "733": "CSE",
+          "735": "ECE",
+          "734": "EEE",
+          "736": "MECH",
+          "771": "AIDS",
+          "729": "AIML",
+        };
+        return branchMap[branchCode] === branchFilter;
+      });
     }
+
+    // Year filter (digits 5-6 in 0-based index = positions 6-7 in roll number)
+    if (yearFilter) {
+      filtered = filtered.filter((student) => {
+        const yearDigits = student.roll_no.slice(4, 6);
+        const yearMap = {
+          "24": "1", // 1st year
+          "23": "2", // 2nd year
+          "22": "3", // 3rd year
+          "21": "4", // 4th year
+        };
+        return yearMap[yearDigits] === yearFilter;
+      });
+    }
+
+    // Section filter (last 3 digits determine section, now positions 10-12)
     if (sectionFilter) {
-      filtered = filtered.filter((student) => student.section === sectionFilter);
+      filtered = filtered.filter((student) => {
+        const sectionIndicator = parseInt(student.roll_no.slice(9, 12));
+        const branchCode = student.roll_no.slice(6, 9);
+        const branchMap = {
+          "737": "IT",
+          "733": "CSE",
+          "735": "ECE",
+          "734": "EEE",
+          "736": "MECH",
+          "771": "AIDS",
+          "729": "AIML",
+        };
+        const branchName = branchMap[branchCode] || "";
+
+        let section;
+        if (sectionIndicator <= 70) section = "1";
+        else if (sectionIndicator <= 140) section = "2";
+        else section = "3";
+
+        return `${branchName}-${section}` === sectionFilter;
+      });
     }
-    if (skillFilter) {
-      filtered = filtered.filter((student) => student.skills.includes(skillFilter));
-    }
+
+    // GPA filter
     if (gpaFilter) {
-      filtered = filtered.filter((student) => student.gpa >= parseFloat(gpaFilter));
+      filtered = filtered.filter((student) => student.CGPA >= parseFloat(gpaFilter));
     }
 
     setFilteredStudents(filtered);
-  }, [search, branchFilter, sectionFilter, skillFilter, gpaFilter]);
+  }, [search, branchFilter, yearFilter, sectionFilter, gpaFilter, students, suggestions, searchTerms]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (search.trim()) {
-        fetchSuggestions();
-      } else {
-        setSuggestions([]);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  const fetchSuggestions = async () => {
+  const fetchStudents = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API_BASE}/search`, { query: search });
-      let fetchedSuggestions = response.data?.improved_queries || [];
-
-      const relevantSuggestions = fetchedSuggestions.filter((suggestion) =>
-        students.some((student) =>
-          [
-            student.name,
-            student.rollNo,
-            student.branch,
-            student.section,
-            ...student.courses,
-            ...student.certificates,
-            ...student.skills,
-          ].some((field) => field.toLowerCase().includes(suggestion.toLowerCase()))
-        )
-      );
-
-      setSuggestions(relevantSuggestions);
+      const response = await axios.get(`${API_BASE}/students`);
+      setStudents(response.data);
+      setFilteredStudents(response.data);
       setError(null);
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-      setError("Failed to fetch suggestions. Please try again.");
+    } catch (err) {
+      console.error("Failed to fetch students:", err);
+      setError("Failed to load student data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -341,82 +359,167 @@ export default function Dashboard() {
   const checkGeminiConnection = async () => {
     try {
       const response = await axios.get(`${API_BASE}/gemini-status`);
-      setGeminiStatus(response.data.status || "Connected");
-    } catch (error) {
-      setGeminiStatus("Not Connected");
-      console.error("Gemini API error:", error);
+      setGeminiStatus(response.data.connected ? "Connected ✅" : "Not Connected ❌");
+    } catch (err) {
+      console.error("Gemini connection check failed:", err);
+      setGeminiStatus("Connection Failed ❌");
     }
   };
 
-  useEffect(() => {
-    checkGeminiConnection();
-  }, []);
+  const fetchSuggestions = async () => {
+    if (!search.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const response = await axios.post(`${API_BASE}/search`, { query: search });
+      setSuggestions(response.data.improved_queries || []);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching suggestions:", err);
+      setSuggestions([]);
+      setError("Failed to get search suggestions. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">CDC Student Search</h1>
-      <p>Gemini Status: {geminiStatus}</p>
+      <h1 className="dashboard-title">Student Dashboard</h1>
+      <div className="status-bar">
+        <span>Gemini Status: {geminiStatus}</span>
+        {isLoading && <span className="loading">Loading...</span>}
+        {error && <span className="error">{error}</span>}
+      </div>
+
+      {/* Filters */}
       <div className="filters">
-        <select onChange={(e) => setBranchFilter(e.target.value)}>
+        <select 
+          value={branchFilter}
+          onChange={(e) => setBranchFilter(e.target.value)}
+        >
           <option value="">All Branches</option>
-          <option value="CSE">CSE</option>
           <option value="IT">IT</option>
+          <option value="CSE">CSE</option>
+          <option value="ECE">ECE</option>
+          <option value="EEE">EEE</option>
+          <option value="MECH">MECH</option>
+          <option value="AIDS">AIDS</option>
+          <option value="AIML">AIML</option>
         </select>
-        <select onChange={(e) => setSectionFilter(e.target.value)}>
+
+        <select
+          value={sectionFilter}
+          onChange={(e) => setSectionFilter(e.target.value)}
+        >
           <option value="">All Sections</option>
-          <option value="CSE-2">CSE-2</option>
-          <option value="IT-1">IT-1</option>
+          {["IT", "CSE", "ECE", "EEE", "MECH", "AIDS", "AIML"].map((branch) => (
+            [1, 2, 3].map((section) => (
+              <option key={`${branch}-${section}`} value={`${branch}-${section}`}>
+                {branch}-{section}
+              </option>
+            ))
+          ))}
         </select>
-        <select onChange={(e) => setSkillFilter(e.target.value)}>
-          <option value="">All Skills</option>
-          <option value="Python">Python</option>
-          <option value="TensorFlow">TensorFlow</option>
-          <option value="R">R</option>
+
+        <select
+          value={yearFilter}
+          onChange={(e) => setYearFilter(e.target.value)}
+        >
+          <option value="">All Years</option>
+          <option value="1">1st Year</option>
+          <option value="2">2nd Year</option>
+          <option value="3">3rd Year</option>
+          <option value="4">4th Year</option>
         </select>
+
         <input
           type="number"
           placeholder="Min GPA"
+          min="0"
+          max="10"
+          step="0.1"
+          value={gpaFilter}
           onChange={(e) => setGpaFilter(e.target.value)}
         />
       </div>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="🔍 Search students..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button onClick={() => setSearch(search)}>Search</button>
+
+      {/* Search and Export */}
+      <div className="search-export">
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="🔍 Search skills, certifications, events..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions()}
+          />
+          <button 
+            onClick={fetchSuggestions}
+            disabled={isSearching}
+            className="search-btn"
+          >
+            {isSearching ? "Searching..." : "Search"}
+          </button>
+        </div>
+        
+        {suggestions.length > 0 && (
+          <div className="suggestions-box">
+            <strong>AI Suggestions:</strong>
+            <div className="suggestions-list">
+              {suggestions.map((suggestion, i) => (
+                <span
+                  key={i}
+                  className="suggestion-tag"
+                  onClick={() => {
+                    if (search.trim()) {
+                      setSearchTerms(prev => [...prev, search.toLowerCase()]);
+                    }
+                    setSearch(suggestion);
+                    setSuggestions([]);
+                  }}
+                >
+                  {suggestion}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <CSVLink
-          data={filteredStudents.map(({ rollNo, name, gpa }) => ({
-            RollNo: rollNo,
-            Name: name,
-            GPA: gpa,
+          data={filteredStudents.map((student) => ({
+            RollNo: student.roll_no,
+            Name: student.name,
+            Branch: student.roll_no.slice(6, 9),
+            Year: student.roll_no.slice(5, 7),
+            Section: (() => {
+              const sectionIndicator = parseInt(student.roll_no.slice(9, 12));
+              if (sectionIndicator <= 70) return "1";
+              if (sectionIndicator <= 140) return "2";
+              return "3";
+            })(),
+            CGPA: student.CGPA,
           }))}
-          filename="students.csv"
+          filename="students_data.csv"
+          className="export-btn"
         >
-          <button>Download CSV</button>
+          Export to CSV
         </CSVLink>
       </div>
-      {isLoading && <p>Loading suggestions...</p>}
-      {error && <p className="error">{error}</p>}
-      {suggestions.length > 0 && (
-        <div className="suggestions">
-          <p>Suggestions:</p>
-          <ul>
-            {suggestions.map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+
+      {/* Results */}
       <div className="student-grid">
         {filteredStudents.length > 0 ? (
-          filteredStudents.map((student, index) => (
-            <StudentCard key={index} student={student} />
+          filteredStudents.map((student) => (
+            <StudentCard key={student.roll_no} student={student} />
           ))
         ) : (
-          <p className="no-students">No students found.</p>
+          <div className="no-results">
+            {students.length === 0 ? "No student data available." : "No students match your filters."}
+          </div>
         )}
       </div>
     </div>
