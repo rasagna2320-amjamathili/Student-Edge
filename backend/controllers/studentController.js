@@ -149,8 +149,6 @@ export const getAllStudents = async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve students." });
     }
 };
-
-
 //Update Student Profiles
 export const updateStudentProfile = async (req, res) => {
     try {
@@ -167,7 +165,7 @@ export const updateStudentProfile = async (req, res) => {
         }
 
         // Ensure proper array updates (convert comma-separated values to arrays)
-        ["skills", "certifications", "techEvents", "extraCurricular", "coCurricular", "additionalFields"].forEach(field => {
+        ["skills", "certifications", "participatedTechEvents", "extraCurricularActivities", "coCurricularActivities", "additionalFields"].forEach(field => {
             if (updateData[field] && typeof updateData[field] === "string") {
                 updateData[field] = updateData[field].split(",").map(item => item.trim());
             }
