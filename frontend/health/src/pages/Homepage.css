@@ -9,10 +9,11 @@
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-body, .app-container {
+body,
+.app-container {
   margin: 0;
   padding: 0;
-  font-family: 'Merriweather', serif; /* More elegant typography */
+  font-family: "Merriweather", serif; /* More elegant typography */
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -25,7 +26,8 @@ body, .app-container {
 }
 
 /* Hide Header and Footer */
-.app-header, .app-footer {
+.app-header,
+.app-footer {
   display: none;
 }
 
@@ -60,14 +62,12 @@ body, .app-container {
   padding: 1.8rem 3rem; /* Balanced padding */
   max-width: 800px; /* Slightly narrower for compact look */
   text-align: center;
-  font-family: 'Quicksand', sans-serif; /* Soft, friendly font */
+  font-family: "Quicksand", sans-serif; /* Soft, friendly font */
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Soft shadow */
   border-radius: 12px; /* Rounded edges */
   background: rgba(0, 0, 0, 0.3); /* Slightly transparent background */
   backdrop-filter: blur(5px); /* Blurred glass effect */
 }
-
-
 
 /* Button Section */
 /* Button Section */
@@ -130,16 +130,14 @@ body, .app-container {
   .auth-buttons {
     flex-direction: column;
   }
-.auth-button {
-  min-width: 260px; /* Increased width */
-  max-width: 300px; /* Slightly longer */
-  padding: 0.6rem 1.8rem; /* Reduced height */
-  border-radius: 10px; /* Soft edges */
-  font-size: 1rem; /* Adjusted font size */
+  .auth-button {
+    min-width: 260px; /* Increased width */
+    max-width: 300px; /* Slightly longer */
+    padding: 0.6rem 1.8rem; /* Reduced height */
+    border-radius: 10px; /* Soft edges */
+    font-size: 1rem; /* Adjusted font size */
+  }
 }
-
-}
-
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -168,4 +166,19 @@ body, .app-container {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Visitor Count Box Styling */
+.visitor-count {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  display: inline-block;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
