@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Student from "../models/studentModel.js";
 import dotenv from "dotenv";
+import {UserLoginCount} from '../models/visitorModel.js';
 
 dotenv.config(); // Load environment variables
 
@@ -13,6 +14,8 @@ if (!SECRET_KEY) {
 }
 
 // User Login Middleware
+ // Ensure you import the visitor model
+
 export const loginUser = async (req, res) => {
     try { 
         console.log("➡️ Received login request");
@@ -56,8 +59,15 @@ export const loginUser = async (req, res) => {
         const token = jwt.sign({ id: user._id, rollNo: user.rollNo }, SECRET_KEY, { expiresIn: "1h" });
 
         console.log("✅ Token Generated:", token);
-        console.log("🚀 Sending Response...");
+        
+        // Increment visitor count after successful login
+        await UserLoginCount.findOneAndUpdate(
+            { _id: 'visitorCount' },
+            { $inc: { count: 1 } },
+            { new: true, upsert: true } // Create document if doesn't exist
+        );
 
+        console.log("🚀 Sending Response...");
         res.json({ token, user });
 
         console.log("✅ Response Sent Successfully");
@@ -70,6 +80,7 @@ export const loginUser = async (req, res) => {
         });
     }
 };
+
 
 // Verify JWT Token Middleware
 export const verifyToken = (req, res, next) => {
