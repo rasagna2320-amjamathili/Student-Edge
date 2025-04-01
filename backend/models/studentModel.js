@@ -12,7 +12,8 @@ const studentSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     unique: true, 
-    match: [/^ugs\d{2}_\d{3}_(it|cse)\.[a-z]+@cbit\.org\.in$/, "Invalid college email format"]
+    match: [/^ugs\d{5}_(it|cse)\.[a-z]+@cbit\.org\.in$/, 'Invalid college email format']
+
   },
   password: { type: String, required: true },
   
