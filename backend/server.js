@@ -1,11 +1,12 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import {connectDB} from "./config/db.js"; 
-import studentRoutes from "./routes/studentRoutes.js"; 
-import jobRoutes from "./routes/jobRoutes.js";
-import mentorRoutes from "./routes/mentorRoutes.js";
-import cdcRoutes from "./routes/cdcRoutes.js";
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { connectDB } from './config/db.js'; 
+import studentRoutes from './routes/studentRoutes.js'; 
+import jobRoutes from './routes/jobRoutes.js';
+import mentorRoutes from './routes/mentorRoutes.js';
+import cdcRoutes from './routes/cdcRoutes.js';
+import { UserLoginCount } from './models/visitorModel.js'; // Import visitor model
 
 // Load environment variables
 dotenv.config();
@@ -25,13 +26,30 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 connectDB();
 
+// Routes
 app.get("/", (req, res) => res.send("API is running"));
-
-// Using routes
 app.use("/api/students", studentRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/cdcs", cdcRoutes);
 app.use("/api/mentors", mentorRoutes);
 
+
+// Route to get the visitor count
+app.get('/visitor-count', async (req, res) => {
+    try {
+      const visitorCount = await UserLoginCount.findOne({ _id: 'visitorCount' });
+  
+      if (!visitorCount) {
+        return res.status(200).json({ count: 0 }); // Explicit status code
+      }
+  
+      return res.status(200).json({ count: visitorCount.count }); // Explicit status code
+    } catch (error) {
+      console.error('Error fetching visitor count:', error); // Log the error
+      return res.status(500).json({ success: false, message: 'Internal server error' }); // More user friendly message
+    }
+  });
+
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
