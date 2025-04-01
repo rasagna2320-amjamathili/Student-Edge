@@ -17,6 +17,8 @@ const studentSchema = new mongoose.Schema({
   password: { type: String, required: true },
   
   // New fields added
+  // Add this field for profile picture storage
+  profilePicture: { type: String, default: "" }, 
   skills: { type: [String], default: [] },
   certifications: { type: [String], default: [] },
   participatedTechEvents: { type: [String], default: [] },
