@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config(); // Load environment variables
 
 console.log("Loaded SECRET_KEY:", process.env.JWT_SECRET);
-const SECRET_KEY = process.env.JWT_SECRET; // Ensure correct variable name
+const SECRET_KEY = process.env.JWT_SECRET; 
 
 if (!SECRET_KEY) {
     throw new Error("SECRET_KEY is not defined in .env file");
@@ -14,7 +14,7 @@ if (!SECRET_KEY) {
 
 // User Login Middleware
 export const loginUser = async (req, res) => {
-    try {
+    try { 
         console.log("➡️ Received login request");
         console.log("📩 Raw Request Body:", req.body); // Debugging
 
