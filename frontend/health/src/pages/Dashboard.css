@@ -5,18 +5,26 @@ body {
   margin: 0;
   padding: 0;
   color: #333;
+  height: 100%;
+  overflow-y: auto;
 }
 
 /* Dashboard Container */
 .dashboard-container {
-  max-width: 1200px;
-  margin: auto;
+  width: 100%;
+  max-width: 1200px; /* Restrict the width for better layout */
+  margin: 0 auto; /* Center the container */
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
+/* Dashboard Title */
 .dashboard-title {
   text-align: center;
-  font-size: 28px;
+  font-size: 32px; /* Make title more prominent */
   font-weight: bold;
   color: #2c3e50;
   margin-bottom: 20px;
@@ -28,125 +36,143 @@ body {
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;
-  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
-
-
-.filters select {
-  padding: 14px;
-  border: 2px solid #bbb;
-  border-radius: 10px;
-  outline: none;
-  font-size: 18px;
-  background: white;
+.filters select,
+.filters input {
+  padding: 12px;
+  border: 1px solid #ccc; /* Subtle border for cleaner look */
+  border-radius: 8px;
+  font-size: 16px;
   color: #333;
-  min-width: 170px;
-  cursor: pointer;
-  transition: border-color 0.3s;
 }
 
 .filters input {
-  flex: 1;
-  min-width: 300px; /* Increased width */
-  padding: 14px; /* Increased padding */
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  outline: none;
-  font-size: 18px; /* Larger font size */
+  width: 220px; /* Adjust input width */
 }
 
 .filters button {
-  padding: 14px 25px; /* Increased padding */
-  font-size: 18px; /* Larger font size */
-  background: #28a745;
+  padding: 12px 20px;
+  font-size: 16px;
+  background: #007bff;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
 }
 
 .filters button:hover {
-  background: #218838;
-  transform: scale(1.05); /* Slight enlargement on hover */
+  background: #0056b3;
 }
 
 /* Student Grid */
 .student-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ensure flexibility */
+  gap: 20px;
+  width: 100%;
+  padding-bottom: 20px;
   margin-top: 20px;
+  justify-items: center;
 }
 
 /* Student Card */
 .student-card {
   background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
-  border: 1px solid #ccc;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 300px; /* Ensure card doesn't stretch too far */
 }
 
 .student-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Profile Picture */
+.student-card img {
+  width: 100px; /* Constrain image size */
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+/* Student Details */
 .student-name {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
-  color: #2c3e50;
-  margin-bottom: 12px;
+  color: #333;
+  margin-bottom: 10px;
 }
 
 .student-email {
-  font-size: 15px;
+  font-size: 14px;
   color: #555;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .student-detail {
-  font-size: 15px;
+  font-size: 14px;
   margin: 6px 0;
   color: #444;
 }
 
-/* Tag Styles */
+/* Tag Container */
+/* General Tag Styles */
 .tag-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
+  justify-content: center;
 }
 
 .tag {
-  background: #f0f0f0;
-  color: #333;
   padding: 8px 14px;
-  border-radius: 20px;
+  border-radius: 15px;
   font-size: 13px;
   font-weight: bold;
   display: inline-block;
+  color: rgb(0, 0, 0); /* Set text color to white for contrast */
 }
 
-.course-tag {
-  background: #e7f3ff;
-  color: #007bff;
-}
-
-.cert-tag {
-  background: #e6ffe6;
-  color: #28a745;
-}
-
+/* Skills Tags */
+/* Skills Tags */
 .skill-tag {
-  background: #fff3e6;
-  color: #fd7e14;
+  background-color: #ffeae6; /* Very light orange */
 }
+
+/* Certificates Tags */
+.cert-tag {
+  background-color: #e8f5e9; /* Very light green */
+}
+
+/* Participated Tech Events Tags */
+.tech-tag {
+  background-color: #e3f2fd; /* Very light blue */
+}
+
+/* Extra-Curricular Activities Tags */
+.extra-tag {
+  background-color: #fff3e0; /* Very light orange */
+}
+
+/* Co-Curricular Activities Tags */
+.co-tag {
+  background-color: #f3e5f5; /* Very light purple */
+}
+
+/* Additional Fields Tags */
+.additional-tag {
+  background-color: #eceff1; /* Very light gray-blue */
+}
+
 
 /* No Students Message */
 .no-students {
@@ -155,69 +181,48 @@ body {
   color: #777;
   margin-top: 20px;
 }
-
-/* Loading and Error Messages */
-.loading,
-.error-message {
-  text-align: center;
-  font-size: 18px;
-  margin-top: 20px;
-}
-
-.loading {
-  color: #28a745;
-}
-
-.error-message {
-  color: #dc3545;
-}
-.search-bar {
+.search-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px; /* Space between input and button */
-  margin: 20px 0;
+  gap: 10px;
+  width: 100%;
 }
 
-.search-bar input {
-  width: 400px; /* Increase width */
-  height: 50px; /* Increase height */
-  padding: 10px;
-  font-size: 18px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-}
-
-.search-bar button {
-  height: 50px;
-  padding: 10px 20px;
-  font-size: 18px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s;
-}
-
-.search-bar button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-.download-btn {
-  margin: 10px 0;
+.search-btn {
   padding: 10px 15px;
-  font-size: 16px;
-  font-weight: bold;
+  background-color: #3f51b5;
   color: white;
-  background-color: #28a745;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s ease;
 }
 
-.download-btn:hover {
-  background-color: #218838;
+.search-btn:disabled {
+  background-color: #9fa8da;
+  cursor: not-allowed;
+}
+
+.suggestions-box {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.suggestion-tag {
+  background-color: #e3f2fd;
+  padding: 4px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.suggestion-tag:hover {
+  background-color: #bbdefb;
 }
