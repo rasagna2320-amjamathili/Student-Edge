@@ -1,10 +1,17 @@
 import bcrypt from "bcrypt";
 import Student from "../models/studentModel.js"; //named import
-import { Mentor } from "../models/mentorModel.js"; //  Import Mentor Model
+import { Mentor } from "../models/mentorModel.js"; // Import Mentor Model
 import mongoose from 'mongoose';
+import dotenv from "dotenv";
+import multer from "multer"; // Import multer using ES module syntax
+import path from "path"; // Import path using ES module syntax
+import fs from "fs"; // Import fs 
+
+dotenv.config();
 
 
 const saltRounds = 10; // Define saltRounds
+
 
 export const createAStudent = async (req, res) => {
     try {
@@ -142,16 +149,31 @@ export const getAllStudents = async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve students." });
     }
 };
+
+
 //Update Student Profiles
 export const updateStudentProfile = async (req, res) => {
     try {
-        const studentId = req.user.id; // Extract from token
-        const updateData = req.body;
+        const studentId = req.user.id;
+        let updateData = { ...req.body }; // Copy request body
 
-        // Prevent editing of non-editable fields
+        // Prevent editing non-editable fields
         const nonEditableFields = ["name", "roll_no", "email", "password"];
         nonEditableFields.forEach(field => delete updateData[field]);
 
+        // Handle profile picture upload
+        if (req.file) {
+            updateData.profilePicture = `http://localhost:5000/uploads/${req.file.filename}`;
+        }
+
+        // Ensure proper array updates (convert comma-separated values to arrays)
+        ["skills", "certifications", "techEvents", "extraCurricular", "coCurricular", "additionalFields"].forEach(field => {
+            if (updateData[field] && typeof updateData[field] === "string") {
+                updateData[field] = updateData[field].split(",").map(item => item.trim());
+            }
+        });
+
+        // Update student profile
         const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
             { $set: updateData },
@@ -162,23 +184,42 @@ export const updateStudentProfile = async (req, res) => {
             return res.status(404).json({ error: "Student not found." });
         }
 
-        res.status(200).json({ message: "Profile updated successfully", student: updatedStudent });
+        // Return updated student data, including the profile image URL
+        res.status(200).json({
+            message: "Profile updated successfully",
+            student: {
+                ...updatedStudent.toObject(),
+                profilePicture: updatedStudent.profilePicture, // Ensure it's included
+            },
+        });
+        
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
-//View student profile
+
+
+
+
+// View student profile
 export const getStudentProfile = async (req, res) => {
     try {
         const studentId = req.user.id; // Extracted from token in authMiddleware
 
-        const student = await Student.findById(studentId).select("-password"); // Exclude password
-        if (!student) {
-            return res.status(404).json({ error: "Student not found." });
+        if (!studentId) {
+            return res.status(400).json({ error: "Invalid user ID" });
         }
 
-        res.status(200).json(student);
+        const student = await Student.findById(studentId).select("-password"); // Exclude password from response
+
+        if (!student) {
+            return res.status(404).json({ error: "Student not found" });
+        }
+
+        res.status(200).json(student); // Return the student data
     } catch (error) {
-        res.status(500).json({ error: "Server error" });
+        console.error("Error fetching student data:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
