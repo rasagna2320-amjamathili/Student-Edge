@@ -1,6 +1,7 @@
 import { CDC } from "../models/cdcModel.js"; 
 import bcrypt from 'bcrypt'; 
 import jwt from 'jsonwebtoken'; 
+import {UserLoginCount} from '../models/visitorModel.js';
 
 
 export const registerCDC = async (req, res) => {
@@ -33,40 +34,50 @@ export const registerCDC = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+// CDC User Login Middleware
+ // Ensure you import the visitor model
+
 export const loginCDC = async (req, res) => {
     try {
-      const { email, password } = req.body;
+        const { email, password } = req.body;
   
-      // Validate input
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required." });
-      }
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ error: "Email and password are required." });
+        }
   
-      // Check if CDC user exists
-      const cdcUser = await CDC.findOne({ email });
-      if (!cdcUser) {
-        return res.status(400).json({ error: "User not found." });
-      }
+        // Check if CDC user exists
+        const cdcUser = await CDC.findOne({ email });
+        if (!cdcUser) {
+            return res.status(400).json({ error: "User not found." });
+        }
   
-      // Check if password matches
-      const isMatch = await bcrypt.compare(password, cdcUser.password);
-      if (!isMatch) {
-        return res.status(400).json({ error: "Invalid password." });
-      }
+        // Check if password matches
+        const isMatch = await bcrypt.compare(password, cdcUser.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: "Invalid password." });
+        }
   
-      // Generate JWT token
-      const token = jwt.sign({ userId: cdcUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+        // Generate JWT token
+        const token = jwt.sign({ userId: cdcUser._id }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
+
+        // Increment visitor count after successful login
+        await UserLoginCount.findOneAndUpdate(
+            { _id: 'visitorCount' },
+            { $inc: { count: 1 } },
+            { new: true, upsert: true } // Create document if doesn't exist
+        );
   
-      // Return token in response
-      res.status(200).json({
-        success: true,
-        token,
-        message: "Login successful!",
-      });
+        // Return token in response
+        res.status(200).json({
+            success: true,
+            token,
+            message: "Login successful!",
+        });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-  };
+};
