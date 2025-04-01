@@ -30,7 +30,60 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  cursor: pointer; /* Makes it clear that this is clickable */
 }
+
+/* Circle container for profile picture */
+.profile-pic-circle {
+  width: 120px;
+  height: 120px;
+  background-color: #3a6073; /* Dark background for the circle */
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Ensures that anything overflowing (like image edges) is clipped */
+  position: relative;
+  cursor: pointer;
+}
+
+/* Profile picture itself - ensuring it's fully contained and circles */
+.profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the circle area without distortion */
+  border-radius: 50%; /* Ensures the image itself is round */
+}
+
+/* Placeholder text inside the circle if no image is selected */
+.placeholder-text {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+/* Edit Icon on Profile Picture */
+.edit-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  border-radius: 50%;
+  padding: 8px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10; /* Ensure it's above other elements */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-icon:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
 
 /* Form Heading (Skills, Certifications, etc.) - Darker for visibility */
 .form-container h2 {
@@ -46,56 +99,44 @@ label {
   display: block;
   margin-top: 12px;
   font-weight: bold;
-  color: #0b3d91; /* Deep blue for strong visibility */
+  color: #0b3d91; /* Deep blue for contrast */
+}
+
+/* Input Fields Styling - Increased Padding */
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
   font-size: 16px;
 }
 
-/* Input Fields */
-input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border: 1px solid #aacfd0;
-  border-radius: 8px;
-  background: #f0f4f8;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #1abc9c;
-  background: #e3f2fd;
-}
-
-/* Buttons */
-.add-field-btn, .submit-btn {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-/* Add Field Button */
-.add-field-btn {
-  background-color: #1abc9c; /* Greenish tint */
-  color: white;
-}
-
-.add-field-btn:hover {
-  background-color: #148f77;
-}
-
-/* Submit Button */
+/* Submit Button Styling */
 .submit-btn {
-  background-color: #2c3e50; /* Dark Blue */
+  background-color: #1abc9c;
   color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .submit-btn:hover {
-  background-color: #1a252f;
+  background-color: #148f77;
+}
+
+/* Add Field Button Styling */
+.add-field-btn {
+  background-color: #f39c12;
+  color: white;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-field-btn:hover {
+  background-color: #e67e22;
 }
