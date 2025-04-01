@@ -88,7 +88,7 @@ const StudentProfile = () => {
           <p>Loading student details...</p>
         ) : student ? (
           <>
-            <div className="profile-section">
+            <div className="photo-section">
               <div className="profile-pic-container">
                 {student?.profilePicture ? (
                   <img src={student.profilePicture} alt="Profile" className="profile-pic" />
@@ -101,7 +101,7 @@ const StudentProfile = () => {
             <p><strong>Name:</strong> {student.name || "-"}</p>
             <p><strong>Roll No:</strong> {student.roll_no || "-"}</p>
             <p><strong>Email:</strong> {student.email || "-"}</p>
-
+            <p><strong>CGPA:</strong>{student.CGPA}</p>
             {/* Displaying other fields safely */}
             <p><strong>Skills:</strong> {student.skills?.length ? student.skills.join(", ") : "-"}</p>
             <p><strong>Certifications:</strong> {student.certifications?.length ? student.certifications.join(", ") : "-"}</p>
