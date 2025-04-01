@@ -2,7 +2,7 @@
 .profile-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;  /* Align to top instead of center */
     min-height: 100vh;
     background-color: #F5E6DA;  /* Solid background */
     padding: 50px;
@@ -17,14 +17,8 @@
     min-height: 80vh;
     border-radius: 18px;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15); /* Less intense shadow */
-    text-align: center;
+    text-align: left;  /* Align text to the left */
     border: none; /* Remove unwanted borders */
-}
-
-/* 🔹 Fix Any Shadow Overflow */
-.profile-card::before,
-.profile-card::after {
-    display: none; /* Ensure no pseudo-elements causing transparency */
 }
 
 /* 🔹 Title */
@@ -32,6 +26,7 @@ h2 {
     color: #8B7355;
     font-size: 28px;
     margin-bottom: 20px;
+    text-align: center;  /* Keep title centered */
 }
 
 /* 🔹 Profile Details */
@@ -39,16 +34,68 @@ p {
     font-size: 18px;
     color: #3D2C21;
     margin: 12px 0;
+    text-align: left;  /* Align profile details to the left */
 }
 
-/* 🔹 Button Group */
+/* 🔹 Profile Picture Section */
+.photo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 🔹 Profile Picture Container */
+.profile-pic-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #8B7355;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #E0C6A8;  /* Fallback color */
+}
+
+/* 🔹 Profile Picture Image */
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 🔹 Placeholder Text When No Picture */
+.placeholder-text {
+    color: #8B7355;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* 🔹 Edit Icon */
+.edit-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+}
+
+/* 🔹 Button Group (Center Align the Buttons) */
 .button-group {
     margin-top: 20px;
+    text-align: center;  /* Center align the buttons */
 }
 
 /* 🔹 Back to Dashboard Button */
-.update-btn {
-    background: #8B7355;
+.update-btn,
+.generate-resume-btn {
+    background: #8B7355;  /* Matching color for both buttons */
     color: white;
     padding: 14px 20px;
     font-size: 16px;
@@ -57,10 +104,12 @@ p {
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.3s ease;
+    margin: 10px 0; /* Ensure spacing between buttons */
 }
 
-.update-btn:hover {
-    background: #6B5D4D;
+.update-btn:hover,
+.generate-resume-btn:hover {
+    background: #6B5D4D; /* Slightly darker shade on hover */
 }
 
 /* 🔹 Resume Section */
@@ -144,5 +193,3 @@ button {
         padding: 12px;
     }
 }
-
-  
