@@ -12,7 +12,6 @@ const StudentHome = () => {
   const [coCurricular, setCoCurricular] = useState("");
   const [additionalFields, setAdditionalFields] = useState([""]);
   const [profilePicture, setProfilePicture] = useState(null);
-  //const [profilePicUrl, setProfilePicUrl] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,10 +84,8 @@ const StudentHome = () => {
       });
 
       if (response.status === 200) {
-        // After successful update, navigate to profile page and refresh details
         setStudent(response.data.student);
         setProfilePicture(response.data.student.profilePicture);
-        console.log(profilePicture);
         navigate("/student-profile");
       } else {
         alert("Something went wrong while updating your profile. Please try again.");
@@ -156,3 +153,4 @@ const StudentHome = () => {
 };
 
 export default StudentHome;
+

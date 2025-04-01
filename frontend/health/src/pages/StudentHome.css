@@ -34,13 +34,22 @@
   cursor: pointer; /* Makes it clear that this is clickable */
 }
 
+/* Profile Picture Container */
+.profile-pic-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
 /* Circle container for profile picture */
 .profile-pic-circle {
   width: 120px;
   height: 120px;
   background-color: #3a6073; /* Dark background for the circle */
   border-radius: 50%;
-  margin: 0 auto 15px;
+  margin-right: 10px; /* Space between profile picture and edit icon */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +72,8 @@
   font-size: 18px;
   font-weight: bold;
 }
-/* Edit Icon on Profile Picture */
+
+/* Edit Icon beside Profile Picture */
 .edit-icon {
   position: absolute;
   bottom: 10px;
@@ -75,15 +85,11 @@
   font-size: 18px;
   cursor: pointer;
   z-index: 10; /* Ensure it's above other elements */
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .edit-icon:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
-
 
 /* Form Heading (Skills, Certifications, etc.) - Darker for visibility */
 .form-container h2 {
