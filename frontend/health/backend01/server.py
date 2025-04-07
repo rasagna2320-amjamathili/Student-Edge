@@ -28,7 +28,7 @@ def home():
 
 # Get all students from MongoDB
 @app.route("/students", methods=["GET"])
-@app.route("/students", methods=["GET"])
+ 
 def get_students():
     try:
         students = list(students_collection.find({}))
@@ -72,7 +72,7 @@ def generate_gemini_response(query):
     1. Correct any typos (e.g., "inteligence" → "intelligence")
     2. Expand all abbreviations (e.g., "SQL" → "Structured Query Language") and provide both full forms and abbreviations.
     3. Ensure the response always includes BOTH the full term and its abbreviation (if applicable).
-    4. Only return computer science-related terms.
+    4. Only return ENGINEERING(ECE,EEE,CSE,IT) terms.
 
     RESPONSE FORMAT (JSON):
     {{
