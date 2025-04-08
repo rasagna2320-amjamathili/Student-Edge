@@ -204,7 +204,7 @@ import "./Dashboard.css";
 import StudentCard from "./StudentCard";
 import { CSVLink } from "react-csv";
 
-const API_BASE = "http://192.168.0.196:5000";
+const API_BASE = "http:// 172.16.7.155:5000";
 
 export default function Dashboard() {
   const [search, setSearch] = useState("");
