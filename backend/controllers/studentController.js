@@ -15,7 +15,6 @@ const saltRounds = 10; // Define saltRounds
 
 export const createAStudent = async (req, res) => {
     try {
-        console.log("Received Data:", req.body); // Debugging
         const { name, roll_no, email, skills, certifications, techEvents, extraCurricular, coCurricular } = req.body;
 
         if (!name || !roll_no || !email) {
@@ -27,9 +26,6 @@ export const createAStudent = async (req, res) => {
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("Generated Password:", password);
-        console.log("Hashed Password:", hashedPassword);
-
         const newStudent = new Student({
             name,
             roll_no,
