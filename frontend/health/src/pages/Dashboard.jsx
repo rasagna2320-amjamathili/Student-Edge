@@ -42,7 +42,6 @@ export default function Dashboard() {
         const response = await axios.get(`${API_BASE}/gemini-status`);
         setGeminiStatus(response.data.connected);
       } catch (error) {
-        console.error("Error checking Gemini status:", error);
         setGeminiStatus(false);
       }
     };
@@ -61,7 +60,6 @@ export default function Dashboard() {
       setSuggestions(response.data.improved_queries || []);
       setError(null); // Clear any previous errors
     } catch (error) {
-      console.error("Error fetching suggestions:", error);
       setSuggestions([]); // Clear suggestions
       if (error.response && error.response.status === 429) {
         setError("API quota exceeded. Please try again later.");
@@ -238,15 +236,7 @@ export default function Dashboard() {
   useEffect(() => {
     let filtered = [...students];
 
-    // Debug: Log sample student data
-    if (filtered.length > 0) {
-      console.log("Sample student data:", {
-        roll_no: filtered[0].roll_no,
-        branchCode: filtered[0].roll_no.slice(6, 9),
-        yearDigits: filtered[0].roll_no.slice(5, 7),
-        sectionIndicator: filtered[0].roll_no.slice(9, 12),
-      });
-    }
+
 
     // Enhanced search filter (searches both original terms and suggestions)
     if (search.trim() || searchTerms.length > 0) {

@@ -7,6 +7,7 @@ import ForgotPassword from "../pages/ForgotPassword";
 import StudentHome from "../pages/StudentHome"; 
 import ProtectedRoute from "../routes/ProtectedRoute"; 
 import StudentProfile from "../pages/StudentProfile"; 
+import ChangePassword from '../pages/ChangePassword.jsx';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -14,10 +15,12 @@ const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/cdc-login" element={<CdcLogin />} /> {/* ✅ Added CDC Login */}
+      <Route path="/cdc-login" element={<CdcLogin />} /> 
       <Route path="/student-home" element={<StudentHome />} /> 
       <Route path="/forgot-password" element={<ForgotPassword />} /> 
       <Route path="/student-profile" element={<StudentProfile />} /> 
+      <Route path="/change-password" element={<ChangePassword />}/>
+
  
       {/* Protected Routes */}
       <Route
