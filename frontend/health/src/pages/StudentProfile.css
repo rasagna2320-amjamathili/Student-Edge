@@ -4,24 +4,27 @@
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    background-color: #F5E6DA;
     padding: 50px;
     margin: 0;
     width: 100%;
+    box-sizing: border-box;
 }
 
 /* 🔹 Profile Card */
 .profile-card {
-    background: #FFFFFF;
+    background: rgba(255, 255, 255, 0.95);
     padding: 40px;
     width: 100% !important;
-    max-width: 800px;
+    max-width: 1000px;
     min-height: 80vh;
     border-radius: 18px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     text-align: left;
     border: none;
     margin: 0 auto;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 /* 🔹 Title */
@@ -30,6 +33,7 @@ h2 {
     font-size: 28px;
     margin-bottom: 20px;
     text-align: center;
+    word-break: break-word;
 }
 
 /* 🔹 Profile Details */
@@ -38,6 +42,9 @@ p {
     color: #3D2C21;
     margin: 12px 0;
     text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* 🔹 Profile Picture Section */
@@ -85,7 +92,6 @@ p {
 /* 🔹 Edit Icon */
 .edit-icon {
     position: absolute;
-    /* top: 10px; */
     right: 10px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
@@ -142,6 +148,7 @@ textarea {
 }
 
 /* 🔹 Resume Output */
+/* 🔹 Resume Output */
 .resume-output {
     margin-top: 20px;
     padding: 15px;
@@ -150,7 +157,13 @@ textarea {
     font-size: 16px;
     text-align: left;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    overflow-x: auto;           /* ✅ Enables horizontal scrolling for long lines */
+    max-width: 100%;            /* ✅ Prevents it from exceeding parent width */
+    box-sizing: border-box;     /* ✅ Includes padding in width calc */
 }
+
 
 /* 🔹 Buttons */
 button {
