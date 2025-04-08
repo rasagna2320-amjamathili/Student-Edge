@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
+
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "./StudentProfile.css";
@@ -10,6 +11,14 @@ const StudentProfile = () => {
   const [requirements, setRequirements] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   // Fetch student data once component mounts
   useEffect(() => {
@@ -95,7 +104,6 @@ const StudentProfile = () => {
       }
   
       const data = await response.json();
-      console.log("Gemini API Response:", data);
       const generatedResume = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Failed to generate resume.";
   
       setResume(generatedResume);
@@ -136,6 +144,17 @@ const StudentProfile = () => {
   return (
     <div className="profile-container">
       <div className="profile-card">
+      <div className="kebab-menu" onClick={toggleMenu}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        {isMenuOpen && (
+          <div className="menu-options">
+            <Link to="/change-password">Change Password</Link>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        )}
         <h2>Student Profile</h2>
 
         {loading ? (
