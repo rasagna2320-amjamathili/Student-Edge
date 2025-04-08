@@ -11,7 +11,6 @@ import { UserLoginCount } from './models/visitorModel.js'; // Import visitor mod
 // Load environment variables
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET;
-console.log("Loaded SECRET_KEY:", SECRET_KEY);
 
 if (!SECRET_KEY) {
     throw new Error("SECRET_KEY is missing in .env file");
@@ -51,5 +50,4 @@ app.get('/visitor-count', async (req, res) => {
   });
 
 // Start the server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
+app.listen(PORT, () => console.log(`Server is running`));

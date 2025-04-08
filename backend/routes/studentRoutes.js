@@ -7,9 +7,11 @@ import {
   updateStudentProfile,
   createMultipleStudents,
   getAllStudents,
-  getStudentProfile
+  getStudentProfile,
+  
+  
 } from "../controllers/studentController.js";
-import { loginUser, verifyToken } from "../middlewares/authMiddleware.js"; 
+import { loginUser, verifyToken,changePassword, forgotPasswordRequest, resetPassword } from "../middlewares/authMiddleware.js"; 
 
 const router = express.Router();
 
@@ -36,6 +38,10 @@ router.post("/createMultiple", createMultipleStudents);
 router.get("/profile", verifyToken, getStudentProfile);
 router.get('/me', verifyToken, getStudentProfile);
 router.patch('/update', verifyToken, upload.single('profilePicture'), updateStudentProfile);
+router.post('/changePassword', verifyToken, changePassword);
+router.post('/logout', verifyToken);
+router.post('/forgot-password', forgotPasswordRequest); 
+router.post('/reset-password/:userId/:token', resetPassword);
 
 
 
