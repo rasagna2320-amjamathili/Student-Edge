@@ -235,7 +235,7 @@ ${educationText}${nextSection}`
           <p>Loading student details...</p>
         ) : student ? (
           <>
-            <div className="photo-section">
+            <div className="profile-section">
               <div className="profile-pic-container">
                 {student?.profilePicture ? (
                   <img src={student.profilePicture} alt="Profile" className="profile-pic" />
