@@ -12,6 +12,17 @@ const StudentProfile = () => {
   const [requirements, setRequirements] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+
+  const toggleMenu = () => { 
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login"); 
+  };
+
 
   useEffect(() => {
     const fetchStudentData = async () => {
