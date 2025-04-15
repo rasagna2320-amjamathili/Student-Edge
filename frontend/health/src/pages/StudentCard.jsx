@@ -1,81 +1,100 @@
 import React from "react";
-import "./StudentCard.css";
+import "./Dashboard.css";
 
 export default function StudentCard({ student }) {
   if (!student) {
     return <p className="error">Student data is missing.</p>;
   }
 
-  const renderDetailSection = (title, items, type) => {
-    if (!items || items.length === 0) return null;
-    
-    return (
-      <div className="detail-section">
-        <h3 className="section-title">{title}</h3>
-        <div className="tag-container">
-          {items.map((item, i) => {
-            const isMatched = student.matchedSkills?.some(skill => 
-              item.toLowerCase().includes(skill.toLowerCase())
-            );
-            
-            return (
-              <span 
-                key={i} 
-                className={`tag ${type}-tag ${isMatched ? "matched" : ""}`}
-              >
-                {item}
-              </span>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="student-card">
-      <div className="student-header">
-        <img
-          src={student.profilePicture || "/default-profile.png"}
-          alt="Profile"
-          className="student-profile-picture"
-          onError={(e) => {
-            e.target.onerror = null; 
-            e.target.src = "/default-profile.png";
-          }}
-        />
-        <div className="student-basic-info">
-          <h2 className="student-name">{student.name || "N/A"}</h2>
-          <p className="student-email">{student.email || "N/A"}</p>
-          <div className="student-meta">
-            <span className="meta-item">
-              <strong>Roll No:</strong> {student.roll_no || "N/A"}
-            </span>
-            <span className="meta-item">
-              <strong>CGPA:</strong> {student.CGPA || "N/A"}
-            </span>
-            {student.matchPercentage > 0 && (
-              <span className="meta-item match-percentage">
-                <strong>Match:</strong> {student.matchPercentage}%
-                <div className="match-bar">
-                  <div 
-                    className="match-progress" 
-                    style={{ width: `${student.matchPercentage}%` }}
-                  ></div>
-                </div>
-              </span>
-            )}
-          </div>
+      <img
+        src={student.profilePicture || ""}
+        alt="Profile"
+        className="student-profile-picture"
+      />
+      <h2 className="student-name">{student.name || "N/A"}</h2>
+      <p className="student-email">{student.email || "N/A"}</p>
+      <p className="student-detail"><strong>Roll No:</strong> {student.roll_no || "N/A"}</p>
+ 
+      <p className="student-detail"><strong>CGPA:</strong> {student.CGPA || "N/A"}</p>
+
+      <div className="student-info">
+        <strong>Skills:</strong>
+        <div className="tag-container">
+          {Array.isArray(student.skills) && student.skills.length > 0 ? (
+            student.skills.map((skill, i) => (
+              <span key={i} className="tag skill-tag">{skill}</span>
+            ))
+          ) : (
+            <p>No skills listed</p>
+          )}
         </div>
       </div>
-
-      <div className="student-details">
-        {renderDetailSection("Skills", student.skills, "skill")}
-        {renderDetailSection("Certifications", student.certifications, "cert")}
-        {renderDetailSection("Tech Events", student.participatedTechEvents, "tech")}
-        {renderDetailSection("Extra-Curricular", student.extraCurricularActivities, "extra")}
-        {renderDetailSection("Co-Curricular", student.coCurricularActivities, "co")}
-        {renderDetailSection("Additional Fields", student.additionalFields, "additional")}
+<p></p>
+      <div className="student-info">
+        <strong>Certifications:</strong>
+        <div className="tag-container">
+          {Array.isArray(student.certifications) && student.certifications.length > 0 ? (
+            student.certifications.map((cert, i) => (
+              <span key={i} className="tag cert-tag">{cert}</span>
+            ))
+          ) : (
+            <p>No certifications listed</p>
+          )}
+        </div>
+      </div>
+      <p></p>
+      <div className="student-info">
+        <strong>Participated Tech Events:</strong>
+        <div className="tag-container">
+          {Array.isArray(student.participatedTechEvents) && student.participatedTechEvents.length > 0 ? (
+            student.participatedTechEvents.map((event, i) => (
+              <span key={i} className="tag tech-tag">{event}</span>
+            ))
+          ) : (
+            <p>No tech events listed</p>
+          )}
+        </div>
+      </div>
+      <p></p>
+      <div className="student-info">
+        <strong>Extra-Curricular Activities:</strong>
+        <div className="tag-container">
+          {Array.isArray(student.extraCurricularActivities) && student.extraCurricularActivities.length > 0 ? (
+            student.extraCurricularActivities.map((activity, i) => (
+              <span key={i} className="tag extra-tag">{activity}</span>
+            ))
+          ) : (
+            <p>No extra-curricular activities listed</p>
+          )}
+        </div>
+      </div>
+      <p></p>
+      <div className="student-info">
+        <strong>Co-Curricular Activities:</strong>
+        <div className="tag-container">
+          {Array.isArray(student.coCurricularActivities) && student.coCurricularActivities.length > 0 ? (
+            student.coCurricularActivities.map((activity, i) => (
+              <span key={i} className="tag co-tag">{activity}</span>
+            ))
+          ) : (
+            <p>No co-curricular activities listed</p>
+          )}
+        </div>
+      </div>
+      <p></p>
+      <div className="student-info">
+        <strong>Additional Fields:</strong>
+        <div className="tag-container">
+          {Array.isArray(student.additionalFields) && student.additionalFields.length > 0 ? (
+            student.additionalFields.map((field, i) => (
+              <span key={i} className="tag additional-tag">{field}</span>
+            ))
+          ) : (
+            <p>No additional fields listed</p>
+          )}
+        </div>
       </div>
     </div>
   );
