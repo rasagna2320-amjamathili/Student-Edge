@@ -214,3 +214,65 @@ button {
         padding: 12px;
     }
 }
+/* Profile Card Styling - Increased Size */
+.profile-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px; /* Increased padding */
+    border-radius: 14px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    width: 500px; /* Increased width */
+    text-align: center;
+  }
+
+  /* ☰ Kebab Menu Styling */
+.kebab-menu {
+    position: absolute; /* To position it in the top right of the card */
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  .kebab-menu span {
+    display: block;
+    width: 5px;
+    height: 5px;
+    background-color: #8B7355; /* Match your theme color */
+    border-radius: 50%;
+  }
+  
+  /* Menu Options Styling */
+  .menu-options {
+    position: absolute;
+    top: 50px; /* Adjust based on the position of the kebab menu */
+    right: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 0;
+    z-index: 100; /* Ensure it's above other elements */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .menu-options a,
+  .menu-options button {
+    display: block;
+    padding: 8px 20px;
+    text-decoration: none;
+    color: #3D2C21; /* Match your text color */
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .menu-options a:hover,
+  .menu-options button:hover {
+    background-color: #eee;
+  }

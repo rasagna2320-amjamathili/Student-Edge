@@ -11,7 +11,6 @@ const Home = () => {
       try {
         const response = await fetch('http://localhost:5000/visitor-count');
         const data = await response.json();
-        console.log("Data from backend:", data); // Add this line
         setVisitorCount(data.count);
       } catch (error) {
         console.error("Error fetching visitor count:", error);
