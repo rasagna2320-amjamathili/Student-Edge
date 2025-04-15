@@ -42,7 +42,6 @@ export default function Dashboard() {
         const response = await axios.get(`${API_BASE}/gemini-status`);
         setGeminiStatus(response.data.connected);
       } catch (error) {
-        console.error("Error checking Gemini status:", error);
         setGeminiStatus(false);
       }
     };
@@ -61,7 +60,6 @@ export default function Dashboard() {
       setSuggestions(response.data.improved_queries || []);
       setError(null); // Clear any previous errors
     } catch (error) {
-      console.error("Error fetching suggestions:", error);
       setSuggestions([]); // Clear suggestions
       if (error.response && error.response.status === 429) {
         setError("API quota exceeded. Please try again later.");

@@ -5,8 +5,6 @@ const ForgotPassword = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Call API to handle password reset logic
-    console.log("Reset link sent to:", rollNo);
   };
 
   return (

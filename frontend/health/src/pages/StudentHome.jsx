@@ -33,7 +33,6 @@ const StudentHome = () => {
             });
 
             const data = response.data;
-            console.log("Data from backend:", data); // Check the data here
             setStudent(data);
             setSkills(data.skills.join(", ") || "");
             setCertifications(data.certifications.join(", ") || "");

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
+
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "./StudentProfile.css";
@@ -218,12 +219,23 @@ ${educationText}${nextSection}`
   return (
     <div className="profile-container">
       <div className="profile-card">
+      <div className="kebab-menu" onClick={toggleMenu}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        {isMenuOpen && (
+          <div className="menu-options">
+            <Link to="/change-password">Change Password</Link>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        )}
         <h2>Student Profile</h2>
         {loading ? (
           <p>Loading student details...</p>
         ) : student ? (
           <>
-            <div className="photo-section">
+            <div className="profile-section">
               <div className="profile-pic-container">
                 {student?.profilePicture ? (
                   <img src={student.profilePicture} alt="Profile" className="profile-pic" />
