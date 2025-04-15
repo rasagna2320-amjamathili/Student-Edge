@@ -195,7 +195,6 @@ export default function Dashboard() {
   );
 }
 */
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Dashboard.css";
@@ -235,19 +234,16 @@ export default function Dashboard() {
   }, [search]);
 
   useEffect(() => {
-    let filtered = [...students];
+    let filtered = [...students].map(student => {
+      const matchInfo = calculateMatchPercentage(student, searchTerms);
+      return {
+        ...student,
+        matchPercentage: matchInfo.percentage,
+        matchedSkills: matchInfo.matchedSkills,
+        searchTerms: searchTerms
+      };
+    });
 
-    // Debug: Log sample student data
-    if (filtered.length > 0) {
-      console.log("Sample student data:", {
-        roll_no: filtered[0].roll_no,
-        branchCode: filtered[0].roll_no.slice(6, 9),
-        yearDigits: filtered[0].roll_no.slice(5, 7),
-        sectionIndicator: filtered[0].roll_no.slice(9, 12),
-      });
-    }
-
-    // Enhanced search filter (searches both original terms and suggestions)
     if (search.trim() || searchTerms.length > 0) {
       filtered = filtered.filter(student => 
         student.matchPercentage >= matchThreshold
