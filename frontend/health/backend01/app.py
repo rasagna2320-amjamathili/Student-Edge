@@ -1,4 +1,4 @@
-"""from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
 import os
@@ -52,4 +52,4 @@ def generate_resume():
         }), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)"""
+    app.run(host='0.0.0.0', port=5000, debug=True)
