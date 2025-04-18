@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
-import google.generativeai as genai
+from bson.objectid import ObjectId
+import openai
 import json
 import logging
 import os
@@ -12,7 +13,7 @@ import tempfile
 import io
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configure MongoDB
 MONGO_URI = "mongodb+srv://rasagna2023:MongoDB_password@cluster0.g8rue.mongodb.net/studentEdgeDB?retryWrites=true&w=majority&appName=Cluster0"
@@ -20,9 +21,12 @@ client = MongoClient(MONGO_URI)
 db = client['studentEdgeDB']
 students_collection = db['students']
 
-# Configure Google Gemini API
-API_KEY = "AIzaSyCq4J3kWnxSkl5lWgsxJZw1G2fxSM3R9SA"
-genai.configure(api_key=API_KEY)
+# Configure OpenRouter API with DeepSeek
+API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+client = openai.OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=API_KEY
+)
 
 # Configure upload settings
 UPLOAD_FOLDER = tempfile.gettempdir()
@@ -56,7 +60,7 @@ def extract_text_from_docx(filepath):
         logger.error(f"Error reading DOCX: {e}")
         return None
 
-def process_document_with_gemini(text):
+def process_document_with_deepseek(text):
     prompt = f"""
     Analyze this job description/document and extract ALL the key technical skills, 
     programming languages, frameworks, and other relevant requirements. 
@@ -67,11 +71,13 @@ def process_document_with_gemini(text):
     2. Include both full forms and abbreviations (e.g., "SQL" and "Structured Query Language")
     3. Include programming languages, databases, frameworks, tools, etc.
     4. Return a comprehensive list without omitting any technical requirements
+    5. Output MUST be in strict JSON format as specified below
+    6. Do NOT include any markdown (e.g., ```json) or additional text outside the JSON
 
     DOCUMENT CONTENT:
     {text}
 
-    REQUIRED OUTPUT FORMAT (JSON):
+    REQUIRED OUTPUT FORMAT (strict JSON):
     {{
         "skills": ["complete", "list", "of", "all", "technical", "requirements"],
         "summary": "Brief summary of requirements"
@@ -87,9 +93,20 @@ def process_document_with_gemini(text):
     """
     
     try:
-        model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
-        response = model.generate_content(prompt)
-        cleaned_response = response.text.strip().replace("```json", "").replace("```", "").strip()
+        response = client.chat.completions.create(
+            model="deepseek/deepseek-chat",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500,
+            temperature=0.2  # Lower temperature for more structured output
+        )
+        raw_response = response.choices[0].message.content.strip()
+        logger.info(f"Raw DeepSeek response: {raw_response}")  # Log raw response for debugging
+
+        # Remove ```json markers if present
+        cleaned_response = raw_response.replace("```json", "").replace("```", "").strip()
+        if not cleaned_response:
+            raise ValueError("Empty response after cleaning")
+
         result = json.loads(cleaned_response)
         
         # Ensure we have a list of skills
@@ -100,7 +117,6 @@ def process_document_with_gemini(text):
         cleaned_skills = []
         for skill in result["skills"]:
             if isinstance(skill, str):
-                # Normalize skill names
                 skill = skill.lower().strip()
                 if skill and skill not in cleaned_skills:
                     cleaned_skills.append(skill)
@@ -108,8 +124,11 @@ def process_document_with_gemini(text):
         result["skills"] = cleaned_skills
         return result
         
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}, Raw response: {raw_response}")
+        return None
     except Exception as e:
-        logger.error(f"Gemini document processing error: {e}")
+        logger.error(f"DeepSeek document processing error: {e}")
         return None
 
 @app.route("/")
@@ -127,21 +146,47 @@ def get_students():
         logger.error(f"Error fetching students: {e}")
         return jsonify({"error": "Failed to fetch students"}), 500
 
-def check_gemini_connection():
+@app.route("/health", methods=["GET"])
+def health_check():
     try:
-        model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
-        response = model.generate_content("Connection test")
-        return response.text is not None
+        client.admin.command("ping")
+        return jsonify({"status": "healthy", "db_connected": True}), 200
     except Exception as e:
-        logger.error(f"Gemini connection error: {e}")
-        return False
+        logger.error(f"Database connection failed: {e}")
+        return jsonify({"status": "unhealthy", "db_connected": False, "error": str(e)}), 500
 
-@app.route("/gemini-status", methods=["GET"])
-def gemini_status():
-    return jsonify({"connected": check_gemini_connection()})
+def check_deepseek_connection():
+    try:
+        response = client.chat.completions.create(
+            model="deepseek/deepseek-chat",
+            messages=[{"role": "user", "content": "Connection test"}],
+            max_tokens=10
+        )
+        content = response.choices[0].message.content.strip()
+        is_valid = bool(content) and "error" not in content.lower()  # Basic check for valid response
+        return {
+            "connected": True,
+            "key_valid": True,
+            "response_ok": is_valid,
+            "message": "DeepSeek API is responding" if is_valid else "Response invalid"
+        }
+    except openai.AuthenticationError:
+        logger.error("Invalid API key")
+        return {"connected": False, "key_valid": False, "response_ok": False, "message": "Invalid API key"}
+    except openai.RateLimitError:
+        logger.error("Rate limit exceeded")
+        return {"connected": True, "key_valid": True, "response_ok": False, "message": "Rate limit exceeded"}
+    except Exception as e:
+        logger.error(f"DeepSeek connection error: {e}")
+        return {"connected": False, "key_valid": True, "response_ok": False, "message": str(e)}
 
-def generate_gemini_response(query):
-    abbreviation_fallback = {
+@app.route("/ai-status", methods=["GET"])
+def ai_status():
+    return jsonify(check_deepseek_connection())
+
+def generate_deepseek_response(query):
+    # Comprehensive abbreviation mapping
+    abbreviation_map = {
         "SQL": "Structured Query Language",
         "AI": "Artificial Intelligence",
         "ML": "Machine Learning",
@@ -149,7 +194,31 @@ def generate_gemini_response(query):
         "OS": "Operating System",
         "DSA": "Data Structures and Algorithms",
         "OOP": "Object-Oriented Programming",
+        "UI": "User Interface",
+        "UX": "User Experience",
+        "API": "Application Programming Interface",
+        "CSS": "Cascading Style Sheets",
+        "HTML": "Hypertext Markup Language",
+        "JS": "JavaScript",
+        "REST": "Representational State Transfer",
+        "IOT": "Internet of Things",
+        "NLP": "Natural Language Processing",
+        "CV": "Computer Vision",
+        "GUI": "Graphical User Interface",
+        "CI/CD": "Continuous Integration/Continuous Deployment",
+        "VCS": "Version Control System",
+        "IDE": "Integrated Development Environment",
+        "ORM": "Object-Relational Mapping",
+        "JVM": "Java Virtual Machine",
+        "HTTP": "Hypertext Transfer Protocol",
+        "HTTPS": "Hypertext Transfer Protocol Secure",
+        "TCP/IP": "Transmission Control Protocol/Internet Protocol",
+        "NoSQL": "Not Only SQL",
+        "RDBMS": "Relational Database Management System",
     }
+    
+    # Reverse mapping (full form to abbreviation)
+    reverse_map = {v.lower(): k for k, v in abbreviation_map.items()}
 
     prompt = f"""
     You are an AI-enhanced search assistant for engineering student profiles.
@@ -161,7 +230,10 @@ def generate_gemini_response(query):
     2. If the query is an abbreviation (e.g., "AI", "ML"), expand it (e.g., "Artificial Intelligence", "Machine Learning")
     3. If the query is a full form (e.g., "Artificial Intelligence"), include its abbreviation too ("AI").
     4. Filter out unrelated or general words. Focus only on terms related to CSE, ECE, EEE, IT (technical fields).
-    5. Make sure the returned suggestions match **complete terms only**, not substrings inside unrelated words.
+    5. Ensure matches are EXACT standalone terms only, not substrings within unrelated words.
+       For example, "AI" should NOT match "Chaitanya", "Blockchain", or "Chain".
+    6. ALWAYS include both the abbreviation AND the full form in suggestions.
+    7. Split multi-word queries (e.g., "AI ML Python") into individual terms and process each separately.
 
     OUTPUT FORMAT (strict JSON):
     {{
@@ -173,30 +245,104 @@ def generate_gemini_response(query):
     }}
 
     Examples:
-    - Input: "artificil inteligence" → Output: {{"corrected_query": "Artificial Intelligence", "expanded_terms": [...], ...}}
-    - Input: "AI" → Output: {{"corrected_query": "AI", "expanded_terms": ["Artificial Intelligence"], ...}}
-    - Input: "Machine Learning" → Output includes both "ML" and "Machine Learning"
+    - Input: "artificil inteligence" → Output includes ["AI", "Artificial Intelligence"]
+    - Input: "AI" → Output includes ["AI", "Artificial Intelligence"]
+    - Input: "Machine Learning" → Output includes ["ML", "Machine Learning"]
+    - Input: "ai ml python" → Output includes ["AI", "Artificial Intelligence", "ML", "Machine Learning", "Python"]
     """
 
     try:
-        model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
-        response = model.generate_content(prompt)
-        cleaned_response = response.text.strip().replace("```json", "").replace("```", "").strip()
-
+        response = client.chat.completions.create(
+            model="deepseek/deepseek-chat",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=200
+        )
+        cleaned_response = response.choices[0].message.content.strip()
         parsed = json.loads(cleaned_response)
 
-        # Fallback logic
-        if not parsed.get("expanded_terms") and parsed.get("corrected_query", "").upper() in abbreviation_fallback:
-            full_term = abbreviation_fallback[parsed["corrected_query"].upper()]
-            parsed["expanded_terms"] = [full_term]
-            parsed["abbreviations"] = [parsed["corrected_query"].upper()]
-            parsed["all_suggestions"] = list(set([full_term, parsed["corrected_query"].upper()]))
+        # Split query into individual terms
+        query_terms = query.lower().strip().split()
+
+        # Initialize output fields
+        parsed["expanded_terms"] = parsed.get("expanded_terms", [])
+        parsed["abbreviations"] = parsed.get("abbreviations", [])
+        parsed["all_suggestions"] = parsed.get("all_suggestions", [])
+
+        # Process each query term
+        for term in query_terms:
+            term = term.strip()
+            if not term:
+                continue
+
+            # Check if term is an abbreviation
+            if term.upper() in abbreviation_map:
+                full_form = abbreviation_map[term.upper()]
+                if full_form not in parsed["expanded_terms"]:
+                    parsed["expanded_terms"].append(full_form)
+                if term.upper() not in parsed["abbreviations"]:
+                    parsed["abbreviations"].append(term.upper())
+            # Check if term is a full form
+            elif term.lower() in reverse_map:
+                abbr = reverse_map[term.lower()]
+                if term not in parsed["expanded_terms"]:
+                    parsed["expanded_terms"].append(term)
+                if abbr not in parsed["abbreviations"]:
+                    parsed["abbreviations"].append(abbr)
+            # Add term as-is if not in maps (e.g., "Python")
+            else:
+                if term not in parsed["all_suggestions"]:
+                    parsed["all_suggestions"].append(term)
+
+        # Ensure all_suggestions includes everything
+        parsed["all_suggestions"] = list(set(
+            parsed["expanded_terms"] +
+            parsed["abbreviations"] +
+            parsed["all_suggestions"]
+        ))
+
+        # Remove any empty or invalid entries
+        parsed["all_suggestions"] = [s for s in parsed["all_suggestions"] if s]
+        parsed["expanded_terms"] = [s for s in parsed["expanded_terms"] if s]
+        parsed["abbreviations"] = [s for s in parsed["abbreviations"] if s]
 
         return parsed
 
     except Exception as e:
-        logger.error(f"Gemini processing error: {e}")
-        return None
+        logger.error(f"DeepSeek processing error: {e}")
+        # Fallback processing
+        result = {
+            "original_query": query,
+            "corrected_query": query,
+            "expanded_terms": [],
+            "abbreviations": [],
+            "all_suggestions": []
+        }
+
+        # Split query into terms
+        query_terms = query.lower().strip().split()
+
+        for term in query_terms:
+            term = term.strip()
+            if not term:
+                continue
+            # Check if term is an abbreviation
+            if term.upper() in abbreviation_map:
+                full_form = abbreviation_map[term.upper()]
+                result["expanded_terms"].append(full_form)
+                result["abbreviations"].append(term.upper())
+                result["all_suggestions"].extend([term.upper(), full_form])
+            # Check if term is a full form
+            elif term.lower() in reverse_map:
+                abbr = reverse_map[term.lower()]
+                result["expanded_terms"].append(term)
+                result["abbreviations"].append(abbr)
+                result["all_suggestions"].extend([term, abbr])
+            # Add term as-is
+            else:
+                result["all_suggestions"].append(term)
+
+        result["all_suggestions"] = list(set(result["all_suggestions"]))
+        return result
 
 @app.route("/search", methods=["POST"])
 def improved_search():
@@ -206,33 +352,22 @@ def improved_search():
     if not query:
         return jsonify({"error": "Empty query"}), 400
 
-    # Process query using Gemini
-    gemini_response = generate_gemini_response(query)
+    # Process query using DeepSeek
+    deepseek_response = generate_deepseek_response(query)
 
-    if not gemini_response:
+    if not deepseek_response:
         return jsonify({
             "original_query": query,
-            "improved_queries": [query]  # Fallback to original
+            "improved_queries": [query]
         })
 
-    # Ensure SQL is always included if relevant
-    if "sql" in query.lower() or "structured query language" in query.lower():
-        if "SQL" not in gemini_response["abbreviations"]:
-            gemini_response["abbreviations"].append("SQL")
-        if "Structured Query Language" not in gemini_response["expanded_terms"]:
-            gemini_response["expanded_terms"].append("Structured Query Language")
-
     # Combine all suggestions
-    all_suggestions = list(set(
-        gemini_response["expanded_terms"] +
-        gemini_response["abbreviations"] +
-        [gemini_response["corrected_query"]]
-    ))
+    all_suggestions = list(set(deepseek_response.get("all_suggestions", [])))
 
     return jsonify({
         "original_query": query,
         "improved_queries": all_suggestions,
-        "source": "Gemini AI"
+        "source": "DeepSeek AI"
     })
 
 @app.route("/upload-requirements", methods=["POST"])
@@ -261,8 +396,8 @@ def upload_requirements():
             if not text:
                 return jsonify({"error": "Could not extract text from file"}), 400
                 
-            # Process with Gemini
-            processed = process_document_with_gemini(text)
+            # Process with DeepSeek
+            processed = process_document_with_deepseek(text)
             if not processed:
                 return jsonify({"error": "Failed to process document with AI"}), 500
                 
@@ -284,5 +419,129 @@ def upload_requirements():
     else:
         return jsonify({"error": "File type not allowed"}), 400
 
+@app.route("/students/<string:student_id>", methods=["GET"])
+def get_student(student_id):
+    try:
+        # Attempt to convert student_id to ObjectId
+        student_oid = ObjectId(student_id)
+        student = students_collection.find_one({"_id": student_oid})
+        if student:
+            student["_id"] = str(student["_id"])
+            return jsonify(student)
+        return jsonify({"error": "Student not found"}), 404
+    except Exception as e:
+        logger.error(f"Error fetching student: {e}")
+        # Check if the error is due to invalid ObjectId
+        if "invalid" in str(e).lower():
+            return jsonify({"error": "Invalid student ID format"}), 400
+        return jsonify({"error": "Failed to fetch student"}), 500
+
+@app.route("/generate-resume", methods=["POST"])
+def generate_resume():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        # Extract student data
+        student_data = data.get("student_data")
+        requirements = data.get("requirements", "")
+        
+        if not student_data:
+            return jsonify({"error": "No student data provided"}), 400
+
+        # Branch mapping
+        branch_code = student_data.get("roll_no", "000")[6:9]
+        branch_map = {
+            "737": "Information Technology",
+            "733": "Computer Science and Engineering",
+            "735": "Electronics and Communication Engineering",
+            "734": "Electrical and Electronics Engineering",
+            "736": "Mechanical Engineering",
+            "771": "Artificial Intelligence and Data Science",
+            "729": "Artificial Intelligence and Machine Learning",
+        }
+        branch_name = branch_map.get(branch_code, "Engineering")
+
+        # Prepare prompt for DeepSeek
+        prompt = f"""
+        Create a professional resume using the following student data.
+        
+        INSTRUCTIONS:
+        1. STRICTLY EXCLUDE THE EDUCATION SECTION (we'll add it separately)
+        2. DO NOT include any mention of the student's name or email
+        3. DO NOT use markdown (no asterisks or symbols)
+        4. Use ALL UPPERCASE HEADINGS(BOLD)(OTHER DETAILS LOWERCASE)
+        5. Structure SKILLS into subcategories like:
+           - Programming Languages:
+           - Databases:
+           - Frameworks/Libraries:
+           - Tools:
+           - Others: (if present only)
+        6. Include only these sections in this order:
+           SUMMARY (4 lines only)(NO SUMMARY HEADING EXPLICITLY IT LOOKS ODD), TECHNICAL SKILLS, CERTIFICATIONS, 
+           PROJECTS AND TECHNICAL EVENTS, CO-CURRICULAR ACTIVITIES, 
+           EXTRACURRICULAR ACTIVITIES.
+        
+        STUDENT BACKGROUND:
+        - Pursuing B.Tech in {branch_name}
+        - CGPA: {student_data.get("CGPA", "N/A")}
+        - LinkedIn: {student_data.get("linkedin", "Not provided")}
+        - GitHub: {student_data.get("github", "Not provided")}
+        
+        ADDITIONAL REQUIREMENTS:
+        {requirements if requirements else "No specific requirements provided."}
+
+        SKILLS: {", ".join(student_data.get("skills", [])) or "None"}
+        CERTIFICATIONS: {", ".join(student_data.get("certifications", [])) or "None"}
+        PROJECTS AND EVENTS: {", ".join(student_data.get("participatedTechEvents", [])) or "None"}
+        CO-CURRICULAR: {", ".join(student_data.get("coCurricularActivities", [])) or "None"}
+        EXTRA-CURRICULAR: {", ".join(student_data.get("extraCurricularActivities", [])) or "None"}
+        """
+
+        # Call DeepSeek API
+        response = client.chat.completions.create(
+            model="deepseek/deepseek-chat",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=1500,
+            temperature=0.3
+        )
+        
+        resume_text = response.choices[0].message.content.strip()
+
+        # Add education section at the beginning
+        education_section = f"""
+Chaitanya Bharathi Institute of Technology (CBIT)
+Bachelor of Technology in {branch_name} (Pursuing)
+CGPA: {student_data.get("CGPA", "N/A")}
+
+"""
+        
+        # Insert LinkedIn and GitHub under email if available
+        contact_info = []
+        if student_data.get("linkedin"):
+            contact_info.append(f"LinkedIn: {student_data['linkedin']}")
+        if student_data.get("github"):
+            contact_info.append(f"GitHub: {student_data['github']}")
+        
+        if contact_info:
+            resume_text = resume_text.replace(
+                "SUMMARY",
+                f"{' | '.join(contact_info)}\n\nSUMMARY"
+            )
+
+        full_resume = "EDUCATION\n" + education_section + resume_text
+
+        return jsonify({
+            "resume": full_resume,
+            "status": "success"
+        })
+
+    except Exception as e:
+        logger.error(f"Error generating resume: {e}")
+        return jsonify({
+            "error": "Failed to generate resume",
+            "details": str(e)
+        }), 500
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
