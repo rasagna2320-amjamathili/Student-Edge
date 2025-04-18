@@ -162,3 +162,145 @@
       justify-content: center;
     }
   }
+  .view-profile-btn {
+    background-color: #4CAF50; /* Green background for a positive action */
+    color: white; /* White text for contrast */
+    padding: 8px 16px; /* Comfortable padding */
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Slight rounding for a modern look */
+    cursor: pointer; /* Hand cursor on hover */
+    font-size: 14px; /* Readable font size */
+    font-weight: 500; /* Medium weight for clarity */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline if treated as a link */
+    display: inline-block; /* Ensure proper spacing */
+    margin-top: 10px; /* Space from the card content above */
+  }
+  
+  .view-profile-btn:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  
+  .view-profile-btn:active {
+    background-color: #3d8b40; /* Even darker when clicked */
+  }
+  
+  .view-profile-btn:disabled {
+    background-color: #cccccc; /* Grayed out when disabled */
+    cursor: not-allowed; /* No cursor change when disabled */
+  }
+  .view-profile-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+  }
+  
+  .view-profile-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .view-profile-btn:active {
+    background-color: #3d8b40;
+  }
+  
+  .view-profile-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+/* Social Links Container */
+.social-links {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+/* Base Link Styles */
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* GitHub Specific Styles */
+.social-link.github {
+  color: #24292e;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.social-link.github:hover {
+  background-color: #e5e7eb;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+ 
+/* Social Links Container */
+.social-links-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Base Link Styles - Adjusted for vertical layout */
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+/* GitHub Specific Styles */
+.social-link.github {
+  color: #24292e;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.social-link.github:hover {
+  background-color: #e5e7eb;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* LinkedIn Specific Styles */
+.social-link.linkedin {
+  color: #0077b5;
+  background-color: #e6f2fa;
+  border: 1px solid #cce0f2;
+}
+
+.social-link.linkedin:hover {
+  background-color: #d0e3f5;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* Icons */
+.social-icon {
+  font-size: 1rem;
+}
