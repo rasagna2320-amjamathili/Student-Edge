@@ -195,7 +195,6 @@ export default function Dashboard() {
   );
 }
 */
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Dashboard.css";
@@ -234,11 +233,16 @@ export default function Dashboard() {
 
   // Apply all filters whenever dependencies change
   useEffect(() => {
-    let filtered = [...students];
+    let filtered = [...students].map(student => {
+      const matchInfo = calculateMatchPercentage(student, searchTerms);
+      return {
+        ...student,
+        matchPercentage: matchInfo.percentage,
+        matchedSkills: matchInfo.matchedSkills,
+        searchTerms: searchTerms
+      };
+    });
 
-
-
-    // Enhanced search filter (searches both original terms and suggestions)
     if (search.trim() || searchTerms.length > 0) {
       const searchTerm = search.toLowerCase();
       const lowerSuggestions = suggestions.map(s => s.toLowerCase());
