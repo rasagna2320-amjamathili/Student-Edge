@@ -8,6 +8,7 @@ import StudentHome from "../pages/StudentHome";
 import ProtectedRoute from "../routes/ProtectedRoute"; 
 import StudentProfile from "../pages/StudentProfile"; 
 import ChangePassword from '../pages/ChangePassword.jsx';
+import ProfilePage from "../pages/ProfilePage";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -20,6 +21,7 @@ const AppRoutes = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} /> 
       <Route path="/student-profile" element={<StudentProfile />} /> 
       <Route path="/change-password" element={<ChangePassword />}/>
+      <Route path="/profile/:id" element={<ProfilePage />} />
 
  
       {/* Protected Routes */}
