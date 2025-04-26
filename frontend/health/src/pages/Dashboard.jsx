@@ -521,7 +521,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">Student Dashboard</h1>
+      <h1 className="dashboard-title">CDC Dashboard</h1>
       <div className="status-bar">
         <span>AI Status: {aiStatus}</span>
         {isLoading && <span className="loading">Loading...</span>}

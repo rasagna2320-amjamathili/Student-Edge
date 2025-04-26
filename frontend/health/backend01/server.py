@@ -226,96 +226,81 @@ def generate_deepseek_response(query):
     Given this search query: "{query}"
 
     TASKS:
-    1. Correct any typos. For example: "artificil inteligence" → "Artificial Intelligence"
-    2. If the query is an abbreviation (e.g., "AI", "ML"), expand it (e.g., "Artificial Intelligence", "Machine Learning")
-    3. If the query is a full form (e.g., "Artificial Intelligence"), include its abbreviation too ("AI").
-    4. Filter out unrelated or general words. Focus only on terms related to CSE, ECE, EEE, IT (technical fields).
-    5. Ensure matches are EXACT standalone terms only, not substrings within unrelated words.
-       For example, "AI" should NOT match "Chaitanya", "Blockchain", or "Chain".
-    6. ALWAYS include both the abbreviation AND the full form in suggestions.
-    7. Split multi-word queries (e.g., "AI ML Python") into individual terms and process each separately.
-
+    1. MOST IMPORTANT: Correct any typos in both individual words and multi-word technical terms.
+    2. Identify all technical terms in the query, both single words and multi-word phrases.
+    3. For each technical term:
+       a. If it's an abbreviation, provide its full form
+       b. If it's a full form (possibly with typos), provide its abbreviation
+    4. Handle the query as COMPLETE PHRASES first, then as individual words
+    5. Focus only on terms related to computer science, engineering, and IT fields
+    
     OUTPUT FORMAT (strict JSON):
     {{
         "original_query": "{query}",
-        "corrected_query": "corrected query",
+        "corrected_query": "corrected query with all typos fixed",
         "expanded_terms": ["Expanded Full Term 1", "Expanded Full Term 2"],
         "abbreviations": ["Abbr1", "Abbr2"],
         "all_suggestions": ["All words to be matched for search"]
     }}
-
+    
     Examples:
-    - Input: "artificil inteligence" → Output includes ["AI", "Artificial Intelligence"]
-    - Input: "AI" → Output includes ["AI", "Artificial Intelligence"]
-    - Input: "Machine Learning" → Output includes ["ML", "Machine Learning"]
-    - Input: "ai ml python" → Output includes ["AI", "Artificial Intelligence", "ML", "Machine Learning", "Python"]
+    - For typos in technical terms, correct them and provide both forms
+    - For abbreviations, provide their full forms 
+    - For full terms (even with typos), provide their abbreviations
+    - Always normalize capitalization appropriately
     """
 
     try:
         response = client.chat.completions.create(
             model="deepseek/deepseek-chat",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=200
+            max_tokens=300,
+            temperature=0.1  # Lower temperature for more precise responses
         )
         cleaned_response = response.choices[0].message.content.strip()
+        logger.info(f"DeepSeek search response: {cleaned_response}")
+        
+        # Remove JSON code blocks if present
+        if "```json" in cleaned_response:
+            cleaned_response = cleaned_response.split("```json")[1].split("```")[0]
+        elif "```" in cleaned_response:
+            cleaned_response = cleaned_response.split("```")[1].split("```")[0]
+            
         parsed = json.loads(cleaned_response)
 
-        # Split query into individual terms
-        query_terms = query.lower().strip().split()
+        # Ensure all required fields are present
+        for field in ["corrected_query", "expanded_terms", "abbreviations", "all_suggestions"]:
+            if field not in parsed:
+                parsed[field] = [] if field != "corrected_query" else query
 
-        # Initialize output fields
-        parsed["expanded_terms"] = parsed.get("expanded_terms", [])
-        parsed["abbreviations"] = parsed.get("abbreviations", [])
-        parsed["all_suggestions"] = parsed.get("all_suggestions", [])
+        # Ensure corrected_query is populated
+        if not parsed["corrected_query"]:
+            parsed["corrected_query"] = query
 
-        # Process each query term
-        for term in query_terms:
-            term = term.strip()
-            if not term:
-                continue
-
-            # Check if term is an abbreviation
-            if term.upper() in abbreviation_map:
-                full_form = abbreviation_map[term.upper()]
-                if full_form not in parsed["expanded_terms"]:
-                    parsed["expanded_terms"].append(full_form)
-                if term.upper() not in parsed["abbreviations"]:
-                    parsed["abbreviations"].append(term.upper())
-            # Check if term is a full form
-            elif term.lower() in reverse_map:
-                abbr = reverse_map[term.lower()]
-                if term not in parsed["expanded_terms"]:
-                    parsed["expanded_terms"].append(term)
-                if abbr not in parsed["abbreviations"]:
-                    parsed["abbreviations"].append(abbr)
-            # Add term as-is if not in maps (e.g., "Python")
-            else:
-                if term not in parsed["all_suggestions"]:
-                    parsed["all_suggestions"].append(term)
-
-        # Ensure all_suggestions includes everything
-        parsed["all_suggestions"] = list(set(
-            parsed["expanded_terms"] +
-            parsed["abbreviations"] +
-            parsed["all_suggestions"]
-        ))
-
-        # Remove any empty or invalid entries
-        parsed["all_suggestions"] = [s for s in parsed["all_suggestions"] if s]
-        parsed["expanded_terms"] = [s for s in parsed["expanded_terms"] if s]
-        parsed["abbreviations"] = [s for s in parsed["abbreviations"] if s]
-
+        # Ensure no duplicates and proper formatting
+        parsed["all_suggestions"] = list(set(x for x in parsed.get("all_suggestions", []) if x))
+        parsed["expanded_terms"] = list(set(x for x in parsed.get("expanded_terms", []) if x))
+        parsed["abbreviations"] = list(set(x for x in parsed.get("abbreviations", []) if x))
+        
+        # Add the corrected query to suggestions if not already included
+        if parsed["corrected_query"] and parsed["corrected_query"] not in parsed["all_suggestions"]:
+            parsed["all_suggestions"].append(parsed["corrected_query"])
+            
+        # Add expanded terms and abbreviations to all_suggestions
+        parsed["all_suggestions"].extend([x for x in parsed["expanded_terms"] if x not in parsed["all_suggestions"]])
+        parsed["all_suggestions"].extend([x for x in parsed["abbreviations"] if x not in parsed["all_suggestions"]])
+        
         return parsed
 
     except Exception as e:
         logger.error(f"DeepSeek processing error: {e}")
-        # Fallback processing
+        # General fallback processing that doesn't rely on hardcoded special cases
         result = {
             "original_query": query,
             "corrected_query": query,
             "expanded_terms": [],
             "abbreviations": [],
-            "all_suggestions": []
+            "all_suggestions": [query]  # At minimum, include the original query
         }
 
         # Split query into terms
@@ -325,23 +310,27 @@ def generate_deepseek_response(query):
             term = term.strip()
             if not term:
                 continue
-            # Check if term is an abbreviation
+            
+            # Process abbreviations and full forms from our mapping
             if term.upper() in abbreviation_map:
                 full_form = abbreviation_map[term.upper()]
                 result["expanded_terms"].append(full_form)
                 result["abbreviations"].append(term.upper())
                 result["all_suggestions"].extend([term.upper(), full_form])
-            # Check if term is a full form
             elif term.lower() in reverse_map:
                 abbr = reverse_map[term.lower()]
                 result["expanded_terms"].append(term)
                 result["abbreviations"].append(abbr)
                 result["all_suggestions"].extend([term, abbr])
-            # Add term as-is
             else:
-                result["all_suggestions"].append(term)
+                if term not in result["all_suggestions"]:
+                    result["all_suggestions"].append(term)
 
+        # Remove duplicates
         result["all_suggestions"] = list(set(result["all_suggestions"]))
+        result["expanded_terms"] = list(set(result["expanded_terms"]))
+        result["abbreviations"] = list(set(result["abbreviations"]))
+        
         return result
 
 @app.route("/search", methods=["POST"])
@@ -354,6 +343,7 @@ def improved_search():
 
     # Process query using DeepSeek
     deepseek_response = generate_deepseek_response(query)
+    logger.info(f"Search query: {query}, DeepSeek response: {deepseek_response}")
 
     if not deepseek_response:
         return jsonify({
@@ -543,5 +533,6 @@ CGPA: {student_data.get("CGPA", "N/A")}
             "error": "Failed to generate resume",
             "details": str(e)
         }), 500
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
