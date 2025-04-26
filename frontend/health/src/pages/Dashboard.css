@@ -451,3 +451,25 @@ body {
     justify-content: center;
   }
 }
+.active-terms {
+  margin: 10px 0;
+  padding: 5px;
+  background-color: #f0f4f8;
+  border-radius: 4px;
+}
+
+.term-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.term-tag {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
