@@ -1,14 +1,9 @@
 import bcrypt from "bcrypt";
-import Student from "../models/studentModel.js"; //named import
-import { Mentor } from "../models/mentorModel.js"; // Import Mentor Model
+import Student from "../models/studentModel.js"; 
 import mongoose from 'mongoose';
 import dotenv from "dotenv";
-import multer from "multer"; // Import multer using ES module syntax
-import path from "path"; // Import path using ES module syntax
-import fs from "fs"; // Import fs 
 
 dotenv.config();
-
 
 const saltRounds = 10; // Define saltRounds
 
@@ -109,17 +104,6 @@ export const searchStudents = async (req, res) => {
                 return res.json({ results: students });
             }
     
-           /* //  If no results, integrate GenAI for typo correction or fuzzy matching
-            const correctedQuery = await getCorrectedQuery(searchQuery); // Implement AI logic separately
-            const fuzzyResults = await Student.find({
-                $or: [
-                    { name: { $regex: correctedQuery, $options: "i" } },
-                    { skills: { $regex: correctedQuery, $options: "i" } }
-                ]
-            });
-    
-            res.json({ correctedQuery, results: fuzzyResults });*/
-            //Temporarily handlling the gen Ai part
         }
 
         return res.json({ message: "The GEN AI will fetch results" });
@@ -145,75 +129,182 @@ export const getAllStudents = async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve students." });
     }
 };
-//Update Student Profiles
-export const updateStudentProfile = async (req, res) => {
-    try {
-        const studentId = req.user.id;
-        let updateData = { ...req.body }; // Copy request body
 
-        // Prevent editing non-editable fields
-        const nonEditableFields = ["name", "roll_no", "email", "password"];
-        nonEditableFields.forEach(field => delete updateData[field]);
-
-        // Handle profile picture upload
-        if (req.file) {
-            updateData.profilePicture = `http://localhost:5000/uploads/${req.file.filename}`;
-        }
-
-        // Ensure proper array updates (convert comma-separated values to arrays)
-        ["skills", "certifications", "participatedTechEvents", "extraCurricularActivities", "coCurricularActivities", "additionalFields"].forEach(field => {
-            if (updateData[field] && typeof updateData[field] === "string") {
-                updateData[field] = updateData[field].split(",").map(item => item.trim());
-            }
-        });
-
-        // Update student profile
-        const updatedStudent = await Student.findByIdAndUpdate(
-            studentId,
-            { $set: updateData },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedStudent) {
-            return res.status(404).json({ error: "Student not found." });
-        }
-
-        // Return updated student data, including the profile image URL
-        res.status(200).json({
-            message: "Profile updated successfully",
-            student: {
-                ...updatedStudent.toObject(),
-                profilePicture: updatedStudent.profilePicture, // Ensure it's included
-            },
-        });
-        
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-
-
-
-// View student profile
 export const getStudentProfile = async (req, res) => {
     try {
-        const studentId = req.user.id; // Extracted from token in authMiddleware
+    
+        const studentId = req.user.id;
 
         if (!studentId) {
             return res.status(400).json({ error: "Invalid user ID" });
         }
 
-        const student = await Student.findById(studentId).select("-password"); // Exclude password from response
+        const student = await Student.findById(studentId).select('profilePicture name roll_no currentYear currentSemester'); 
 
         if (!student) {
             return res.status(404).json({ error: "Student not found" });
         }
 
-        res.status(200).json(student); // Return the student data
+        res.status(200).json(student);
     } catch (error) {
-        console.error("Error fetching student data:", error);
+        console.error("Error fetching student profile data:", error);
         res.status(500).json({ error: "Internal server error" });
     }
+}
+
+
+// Function to get professional details
+export const getProfessionalDetails = async (req, res) => {
+  try {
+      const studentId = req.user.id;
+
+      if (!studentId) {
+          return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      const student = await Student.findById(studentId).select('roll_no branch currentYear currentSemester CGPA skills certifications participatedTechEvents extraCurricularActivities coCurricularActivities personalPortfolio competitiveCodingProfiles githubProfile linkedinProfile profilePicture additionalFields -_id');
+
+      if (!student) {
+          return res.status(404).json({ error: "Student not found" });
+      }
+
+      res.status(200).json(student);
+  } catch (error) {
+      console.error("Error fetching professional details:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Function to get personal details
+export const getPersonalDetails = async (req, res) => {
+  try {
+      const studentId = req.user.id;
+
+      if (!studentId) {
+          return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      const student = await Student.findById(studentId).select('name dob contact address motherName fatherName schoolName schoolLocation schoolPercentage schoolBoard interCollegeName interLocation interStream interPercentage interBoard achievements profilePicture -_id');
+
+      if (!student) {
+          return res.status(404).json({ error: "Student not found" });
+      }
+
+      res.status(200).json(student);
+  } catch (error) {
+      console.error("Error fetching personal details:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Function to update personal details
+export const updatePersonalDetails = async (req, res) => {
+  try {
+    
+      const studentId = req.user.id;
+      const updateData = { ...req.body };
+      
+
+      const allowedPersonalFields = [
+          "dob",
+          "contact",
+          "address",
+          "motherName",
+          "fatherName",
+          "schoolName",
+          "schoolLocation",
+          "schoolPercentage",
+          "schoolBoard",
+          "interCollegeName",
+          "interLocation",
+          "interStream",
+          "interPercentage",
+          "interBoard",
+          "achievements",
+      ];
+
+      const filteredUpdateData = {};
+      allowedPersonalFields.forEach((field) => {
+          if (updateData.hasOwnProperty(field)) {
+              filteredUpdateData[field] = updateData[field];
+          }
+      });
+
+      // Ensure array fields are handled correctly (if sent as strings)
+      if (filteredUpdateData.achievements && typeof filteredUpdateData.achievements === "string") {
+          filteredUpdateData.achievements = filteredUpdateData.achievements.split(",").map((item) => item.trim());
+      }
+
+      const updatedStudent = await Student.findByIdAndUpdate(
+          studentId,
+          { $set: filteredUpdateData },
+          { new: true, runValidators: true }
+      );
+
+      if (!updatedStudent) {
+          return res.status(404).json({ error: "Student not found." });
+      }
+
+      res.status(200).json({
+          message: "Personal details updated successfully",
+          student: updatedStudent.toObject(),
+      });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+
+// Function to update professional details
+export const updateProfessionalDetails = async (req, res) => {
+  try {
+      const studentId = req.user.id;
+      const updateData = { ...req.body };
+
+      const allowedProfessionalFields = [
+          "currentYear",
+          "currentSemester",
+          "CGPA",
+          "skills",
+          "certifications",
+          "participatedTechEvents",
+          "extraCurricularActivities",
+          "coCurricularActivities",
+          "personalPortfolio",
+          "competitiveCodingProfiles",
+          "githubProfile",
+          "linkedinProfile",
+          "additionalFields",
+      ];
+
+      const filteredUpdateData = {};
+      allowedProfessionalFields.forEach((field) => {
+          if (updateData.hasOwnProperty(field)) {
+              filteredUpdateData[field] = updateData[field];
+          }
+      });
+
+      // Ensure array fields are handled correctly (if sent as strings)
+      ["skills", "certifications", "participatedTechEvents", "extraCurricularActivities", "coCurricularActivities", "competitiveCodingProfiles", "additionalFields"].forEach(field => {
+          if (filteredUpdateData[field] && typeof filteredUpdateData[field] === "string") {
+              filteredUpdateData[field] = filteredUpdateData[field].split(",").map(item => item.trim());
+          }
+      });
+
+      const updatedStudent = await Student.findByIdAndUpdate(
+          studentId,
+          { $set: filteredUpdateData },
+          { new: true, runValidators: true }
+      );
+
+      if (!updatedStudent) {
+          return res.status(404).json({ error: "Student not found." });
+      }
+
+      res.status(200).json({
+          message: "Professional details updated successfully",
+          student: updatedStudent.toObject(),
+      });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
 };
