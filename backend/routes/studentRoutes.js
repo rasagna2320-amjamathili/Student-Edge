@@ -4,10 +4,13 @@ import path from "path"; // Import path for file extension handling
 import { 
   createAStudent,
   searchStudents,
-  updateStudentProfile,
   createMultipleStudents,
   getAllStudents,
   getStudentProfile,
+  getPersonalDetails,
+  getProfessionalDetails,
+  updatePersonalDetails,
+  updateProfessionalDetails
   
   
 } from "../controllers/studentController.js";
@@ -35,9 +38,14 @@ router.get("/search", searchStudents);
 router.get("/all", getAllStudents);
 router.post("/login", loginUser);  
 router.post("/createMultiple", createMultipleStudents);
-router.get("/profile", verifyToken, getStudentProfile);
+router.get("/personal-details", verifyToken, getPersonalDetails);
+router.put("/personal-details", verifyToken,upload.none(), updatePersonalDetails);
+
+router.get("/professional-details", verifyToken, getProfessionalDetails);
+router.put("/professional-details", verifyToken,upload.none(), updateProfessionalDetails);
+
+router.get('/profile', verifyToken, getStudentProfile);
 router.get('/me', verifyToken, getStudentProfile);
-router.patch('/update', verifyToken, upload.single('profilePicture'), updateStudentProfile);
 router.post('/changePassword', verifyToken, changePassword);
 router.post('/logout', verifyToken);
 router.post('/forgot-password', forgotPasswordRequest); 
