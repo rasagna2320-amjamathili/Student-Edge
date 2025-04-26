@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
-import CdcLogin from "../pages/CdcLogin"; // ✅ Import CDC Login
+import CdcLogin from "../pages/CdcLogin"; 
 import Dashboard from "../pages/Dashboard";
 import ForgotPassword from "../pages/ForgotPassword"; 
 import StudentHome from "../pages/StudentHome"; 
@@ -12,7 +12,6 @@ import ProfilePage from "../pages/ProfilePage";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<Login />} />
