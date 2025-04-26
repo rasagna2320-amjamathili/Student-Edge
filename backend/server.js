@@ -3,8 +3,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { connectDB } from './config/db.js'; 
 import studentRoutes from './routes/studentRoutes.js'; 
-import jobRoutes from './routes/jobRoutes.js';
-import mentorRoutes from './routes/mentorRoutes.js';
 import cdcRoutes from './routes/cdcRoutes.js';
 import { UserLoginCount } from './models/visitorModel.js'; // Import visitor model
 
@@ -28,9 +26,8 @@ connectDB();
 // Routes
 app.get("/", (req, res) => res.send("API is running"));
 app.use("/api/students", studentRoutes);
-app.use("/api/jobs", jobRoutes);
 app.use("/api/cdcs", cdcRoutes);
-app.use("/api/mentors", mentorRoutes);
+
 
 
 // Route to get the visitor count
