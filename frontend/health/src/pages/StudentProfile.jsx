@@ -24,16 +24,6 @@ const StudentProfile = () => {
     navigate("/login");
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -195,7 +185,7 @@ const StudentProfile = () => {
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <div className="profile-header">
+        <div className="profile-header" id = "student-profile-header">
         <h2>Welcome, {personalData?.name || "Student"}</h2>
           {personalData?.profilePicture && (
             <img

@@ -114,9 +114,9 @@ const UpdateProfessionalDetails = () => {
 
         } catch (error) {
 
-            console.error("Error fetching professional details:", error);
+            console.error("Error fetching profile:", error);
 
-            alert("Failed to load professional details.");
+            alert("Failed to load profile.");
 
         }
 
@@ -212,19 +212,19 @@ const UpdateProfessionalDetails = () => {
 
             if (response.status === 200) {
 
-                alert("Professional details updated successfully!");
+                alert("Profile updated successfully!");
 
                 navigate("/professional-details");
 
             } else {
 
-                alert("Failed to update professional details.");
+                alert("Failed to update profile.");
 
             }
 
         } catch (error) {
 
-            console.error("Error updating professional details:", error);
+            console.error("Error updating profile:", error);
 
             alert("An error occurred while updating.");
 
@@ -286,7 +286,7 @@ const UpdateProfessionalDetails = () => {
 
                 <div className="form-container">
 
-                    <h2>Update Professional Details</h2>
+                    <h2>Update Present Profile</h2>
 
                     <form onSubmit={handleSubmit}>
 
@@ -367,7 +367,7 @@ const UpdateProfessionalDetails = () => {
                         <input type="text" value={additionalFields} onChange={(e) => setAdditionalFields(e.target.value)} placeholder="Any other relevant info" />
 
 
-                        <button type="submit" className="submit-btn">Update Professional Details</button>
+                        <button type="submit" className="submit-btn">Update Present Profile</button>
 
                     </form>
 
