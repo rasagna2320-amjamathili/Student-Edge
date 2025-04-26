@@ -195,13 +195,14 @@ export default function Dashboard() {
   );
 }
 */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import "./Dashboard.css";
 import StudentCard from "./StudentCard";
 import { CSVLink } from "react-csv";
+import { FiUpload, FiDownload } from "react-icons/fi";
 
-const API_BASE = "http:// 172.16.7.155:5000";
+const API_BASE = "http://192.168.0.196:5000";
 
 export default function Dashboard() {
   const [search, setSearch] = useState("");
@@ -211,27 +212,31 @@ export default function Dashboard() {
   const [sectionFilter, setSectionFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
   const [gpaFilter, setGpaFilter] = useState("");
+  const [specificFilter, setSpecificFilter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [geminiStatus, setGeminiStatus] = useState("Checking...");
+  const [aiStatus, setAIStatus] = useState("Checking...");
   const [suggestions, setSuggestions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchTerms, setSearchTerms] = useState([]);
+  const [matchThreshold, setMatchThreshold] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Fetch students and check Gemini status on mount
   useEffect(() => {
     fetchStudents();
-    checkGeminiConnection();
+    checkAIStatus();
   }, []);
 
-  // Clear search terms when search is empty
   useEffect(() => {
     if (!search.trim()) {
       setSearchTerms([]);
+      setSuggestions([]);
+    } else {
+      fetchSuggestions();
     }
   }, [search]);
 
-  // Apply all filters whenever dependencies change
   useEffect(() => {
     let filtered = [...students].map(student => {
       const matchInfo = calculateMatchPercentage(student, searchTerms);
@@ -243,97 +248,176 @@ export default function Dashboard() {
       };
     });
 
-    if (search.trim() || searchTerms.length > 0) {
-      const searchTerm = search.toLowerCase();
-      const lowerSuggestions = suggestions.map(s => s.toLowerCase());
-      
-      filtered = filtered.filter((student) => {
-        const searchFields = [
-          ...(student.skills || []),
-          ...(student.certifications || []),
-          ...(student.participatedTechEvents || []),
-          ...(student.extraCurricularActivities || []),
-          ...(student.coCurricularActivities || []),
-          ...(student.additionalFields || [])
-        ];
-
-        // Combine all terms we want to search for
-        const allSearchTerms = [
-          searchTerm,
-          ...searchTerms,
-          ...lowerSuggestions
-        ].filter(term => term.trim() !== '');
-
-        return searchFields.some((field) => {
-          const lowerField = String(field).toLowerCase();
-          return allSearchTerms.some(term => lowerField.includes(term));
-        });
-      });
+    if (specificFilter.trim()) {
+      const specificTerms = specificFilter.split(",").map(term => term.trim().toLowerCase());
+      filtered = filtered.filter(student => 
+        specificTerms.some(term => 
+          (student.name?.toLowerCase().includes(term) || 
+           student.roll_no?.toLowerCase().includes(term) || 
+           student.email?.toLowerCase().includes(term))
+        )
+      );
     }
 
-    // Branch filter (digits 7-9 in 0-based index = positions 7-9 in roll number)
+    if (search.trim() || searchTerms.length > 0) {
+      filtered = filtered.filter(student => 
+        student.matchPercentage >= matchThreshold
+      );
+    }
+
     if (branchFilter) {
       filtered = filtered.filter((student) => {
-        const branchCode = student.roll_no.slice(6, 9);
+        const branchCode = student.roll_no?.slice(6, 9);
         const branchMap = {
-          "737": "IT",
-          "733": "CSE",
-          "735": "ECE",
-          "734": "EEE",
-          "736": "MECH",
-          "771": "AIDS",
-          "729": "AIML",
+          "737": "IT", "733": "CSE", "735": "ECE", 
+          "734": "EEE", "736": "MECH", "771": "AIDS", "729": "AIML"
         };
         return branchMap[branchCode] === branchFilter;
       });
     }
 
-    // Year filter (digits 5-6 in 0-based index = positions 6-7 in roll number)
     if (yearFilter) {
       filtered = filtered.filter((student) => {
-        const yearDigits = student.roll_no.slice(4, 6);
-        const yearMap = {
-          "24": "1", // 1st year
-          "23": "2", // 2nd year
-          "22": "3", // 3rd year
-          "21": "4", // 4th year
-        };
+        const yearDigits = student.roll_no?.slice(4, 6);
+        const yearMap = {"24": "1", "23": "2", "22": "3", "21": "4"};
         return yearMap[yearDigits] === yearFilter;
       });
     }
 
-    // Section filter (last 3 digits determine section, now positions 10-12)
     if (sectionFilter) {
       filtered = filtered.filter((student) => {
-        const sectionIndicator = parseInt(student.roll_no.slice(9, 12));
-        const branchCode = student.roll_no.slice(6, 9);
+        const sectionIndicator = parseInt(student.roll_no?.slice(9, 12));
+        const branchCode = student.roll_no?.slice(6, 9);
         const branchMap = {
-          "737": "IT",
-          "733": "CSE",
-          "735": "ECE",
-          "734": "EEE",
-          "736": "MECH",
-          "771": "AIDS",
-          "729": "AIML",
+          "737": "IT", "733": "CSE", "735": "ECE", 
+          "734": "EEE", "736": "MECH", "771": "AIDS", "729": "AIML"
         };
         const branchName = branchMap[branchCode] || "";
-
-        let section;
-        if (sectionIndicator <= 70) section = "1";
-        else if (sectionIndicator <= 140) section = "2";
-        else section = "3";
-
+        let section = sectionIndicator <= 70 ? "1" : sectionIndicator <= 140 ? "2" : "3";
         return `${branchName}-${section}` === sectionFilter;
       });
     }
 
-    // GPA filter
     if (gpaFilter) {
       filtered = filtered.filter((student) => student.CGPA >= parseFloat(gpaFilter));
     }
 
+    if (searchTerms.length > 0) {
+      filtered.sort((a, b) => b.matchPercentage - a.matchPercentage);
+    }
+
     setFilteredStudents(filtered);
-  }, [search, branchFilter, yearFilter, sectionFilter, gpaFilter, students, suggestions, searchTerms]);
+  }, [search, branchFilter, yearFilter, sectionFilter, gpaFilter, students, suggestions, searchTerms, matchThreshold, specificFilter]);
+
+  const calculateMatchPercentage = (student, requiredSkills) => {
+    if (!requiredSkills || requiredSkills.length === 0) {
+      return { percentage: 0, matchedSkills: [] };
+    }
+
+    const equivalentTerms = {
+      "ai": ["artificial intelligence"],
+      "artificial intelligence": ["ai"],
+      "ml": ["machine learning"],
+      "machine learning": ["ml"],
+      "sql": ["structured query language"],
+      "structured query language": ["sql"],
+      "dbms": ["database management system"],
+      "database management system": ["dbms"],
+      "os": ["operating system"],
+      "operating system": ["os"],
+      "dsa": ["data structures and algorithms", "data structures"],
+      "data structures and algorithms": ["dsa"],
+      "data structures": ["dsa"],
+      "oop": ["object-oriented programming"],
+      "object-oriented programming": ["oop"],
+      "ui": ["user interface"],
+      "user interface": ["ui"],
+      "ux": ["user experience"],
+      "user experience": ["ux"],
+      "api": ["application programming interface"],
+      "application programming interface": ["api"],
+      "css": ["cascading style sheets"],
+      "cascading style sheets": ["css"],
+      "html": ["hypertext markup language"],
+      "hypertext markup language": ["html"],
+      "js": ["javascript"],
+      "javascript": ["js"],
+      "rest": ["representational state transfer"],
+      "representational state transfer": ["rest"],
+      "iot": ["internet of things"],
+      "internet of things": ["iot"],
+      "nlp": ["natural language processing"],
+      "natural language processing": ["nlp"],
+      "cv": ["computer vision"],
+      "computer vision": ["cv"],
+      "gui": ["graphical user interface"],
+      "graphical user interface": ["gui"],
+      "ci/cd": ["continuous integration/continuous deployment"],
+      "continuous integration/continuous deployment": ["ci/cd"],
+      "vcs": ["version control system"],
+      "version control system": ["vcs"],
+      "ide": ["integrated development environment"],
+      "integrated development environment": ["ide"],
+      "orm": ["object-relational mapping"],
+      "object-relational mapping": ["orm"],
+      "jvm": ["java virtual machine"],
+      "java virtual machine": ["jvm"],
+      "http": ["hypertext transfer protocol"],
+      "hypertext transfer protocol": ["http"],
+      "https": ["hypertext transfer protocol secure"],
+      "hypertext transfer protocol secure": ["https"],
+      "tcp/ip": ["transmission control protocol/internet protocol"],
+      "transmission control protocol/internet protocol": ["tcp/ip"],
+      "nosql": ["not only sql"],
+      "not only sql": ["nosql"],
+      "rdbms": ["relational database management system"],
+      "relational database management system": ["rdbms"],
+    };
+
+    const studentData = [
+      ...(student.skills || []),
+      ...(student.certifications || []),
+      ...(student.coCurricularActivities || []),
+      ...(student.additionalFields || [])
+    ].map(item => item.toString().toLowerCase());
+
+    const hasExactWordMatch = (term, dataArray) => {
+      const exactPattern = new RegExp(`(^|\\s|,|\\.|;|:)${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|,|\\.|;|:|$)`, 'i');
+      return dataArray.some(field => exactPattern.test(field));
+    };
+
+    const matchedSkills = [];
+    const alreadyMatched = new Set();
+
+    for (const skill of requiredSkills) {
+      const normalizedSkill = skill.toLowerCase().trim();
+      if (alreadyMatched.has(normalizedSkill)) continue;
+
+      const termsToCheck = [normalizedSkill];
+      if (equivalentTerms[normalizedSkill]) {
+        termsToCheck.push(...equivalentTerms[normalizedSkill]);
+      }
+
+      let foundMatch = false;
+      for (const term of termsToCheck) {
+        if (hasExactWordMatch(term, studentData)) {
+          foundMatch = true;
+          break;
+        }
+      }
+
+      if (foundMatch) {
+        matchedSkills.push(skill);
+        alreadyMatched.add(normalizedSkill);
+        if (equivalentTerms[normalizedSkill]) {
+          equivalentTerms[normalizedSkill].forEach(term => alreadyMatched.add(term));
+        }
+      }
+    }
+
+    const percentage = Math.round((matchedSkills.length / requiredSkills.length) * 100);
+    return { percentage, matchedSkills };
+  };
 
   const fetchStudents = async () => {
     setIsLoading(true);
@@ -350,27 +434,32 @@ export default function Dashboard() {
     }
   };
 
-  const checkGeminiConnection = async () => {
+  const checkAIStatus = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/gemini-status`);
-      setGeminiStatus(response.data.connected ? "Connected ✅" : "Not Connected ❌");
+      const response = await axios.get(`${API_BASE}/ai-status`);
+      const { connected, key_valid, response_ok, message } = response.data;
+      setAIStatus(`${message} (Connected: ${connected}, Key Valid: ${key_valid}, Response OK: ${response_ok})`);
     } catch (err) {
-      console.error("Gemini connection check failed:", err);
-      setGeminiStatus("Connection Failed ❌");
+      console.error("AI status check failed:", err);
+      setAIStatus("Connection Failed ❌");
     }
   };
 
-  const fetchSuggestions = async () => {
+  const fetchSuggestions = useCallback(async () => {
     if (!search.trim()) {
       setSuggestions([]);
+      setSearchTerms([]);
       return;
     }
-    
+
     setIsSearching(true);
     try {
       const response = await axios.post(`${API_BASE}/search`, { query: search });
-      setSuggestions(response.data.improved_queries || []);
-      setError(null);
+      const improvedQueries = response.data.improved_queries || [];
+      // Ensure full phrases and abbreviations are included
+      const processedTerms = processSearchTerms(search);
+      setSuggestions([...new Set([...improvedQueries, ...processedTerms])]);
+      setSearchTerms(processedTerms); // Use processed terms for matching
     } catch (err) {
       console.error("Error fetching suggestions:", err);
       setSuggestions([]);
@@ -378,23 +467,70 @@ export default function Dashboard() {
     } finally {
       setIsSearching(false);
     }
+  }, [search]);
+
+  const processSearchTerms = (input) => {
+    const terms = input.split(",").map(term => term.trim().toLowerCase());
+    const equivalentTerms = {
+      "ai": ["artificial intelligence"],
+      "artificial intelligence": ["ai"],
+      "ml": ["machine learning"],
+      "machine learning": ["ml"],
+      "sql": ["structured query language"],
+      "structured query language": ["sql"],
+      // Add more mappings as needed
+    };
+    const allTerms = [];
+    terms.forEach(term => {
+      allTerms.push(term);
+      if (equivalentTerms[term]) {
+        allTerms.push(...equivalentTerms[term]);
+      }
+    });
+    return [...new Set(allTerms)];
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadStatus("Uploading and processing document...");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${API_BASE}/upload-requirements`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setUploadStatus("Document processed successfully!");
+      setSearchTerms(response.data.skills || []);
+      setSearch(response.data.skills.join(", ") || "");
+      setMatchThreshold(50);
+    } catch (err) {
+      console.error("Error uploading file:", err);
+      setUploadStatus("Failed to process document. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Student Dashboard</h1>
       <div className="status-bar">
-        <span>Gemini Status: {geminiStatus}</span>
+        <span>AI Status: {aiStatus}</span>
         {isLoading && <span className="loading">Loading...</span>}
         {error && <span className="error">{error}</span>}
+        {uploadStatus && <span className={uploadStatus.includes("Failed") ? "error" : "success"}>{uploadStatus}</span>}
       </div>
 
-      {/* Filters */}
       <div className="filters">
-        <select 
-          value={branchFilter}
-          onChange={(e) => setBranchFilter(e.target.value)}
-        >
+        <select value={branchFilter} onChange={(e) => setBranchFilter(e.target.value)}>
           <option value="">All Branches</option>
           <option value="IT">IT</option>
           <option value="CSE">CSE</option>
@@ -405,10 +541,7 @@ export default function Dashboard() {
           <option value="AIML">AIML</option>
         </select>
 
-        <select
-          value={sectionFilter}
-          onChange={(e) => setSectionFilter(e.target.value)}
-        >
+        <select value={sectionFilter} onChange={(e) => setSectionFilter(e.target.value)}>
           <option value="">All Sections</option>
           {["IT", "CSE", "ECE", "EEE", "MECH", "AIDS", "AIML"].map((branch) => (
             [1, 2, 3].map((section) => (
@@ -419,10 +552,7 @@ export default function Dashboard() {
           ))}
         </select>
 
-        <select
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-        >
+        <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>
           <option value="">All Years</option>
           <option value="1">1st Year</option>
           <option value="2">2nd Year</option>
@@ -439,16 +569,39 @@ export default function Dashboard() {
           value={gpaFilter}
           onChange={(e) => setGpaFilter(e.target.value)}
         />
+
+        <input
+          type="text"
+          placeholder="Search by Name, Roll No, or Email (comma-separated)"
+          value={specificFilter}
+          onChange={(e) => setSpecificFilter(e.target.value)}
+        />
+
+        {searchTerms.length > 0 && (
+          <div className="match-filter">
+            <label>Match: ≥{matchThreshold}%</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value={matchThreshold}
+              onChange={(e) => setMatchThreshold(parseInt(e.target.value))}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Search and Export */}
       <div className="search-export">
         <div className="search-container">
           <input
             type="text"
-            placeholder="🔍 Search skills, certifications, events..."
+            placeholder="🔍 Search Students by Their Skills..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              fetchSuggestions();
+            }}
             onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions()}
           />
           <button 
@@ -459,7 +612,7 @@ export default function Dashboard() {
             {isSearching ? "Searching..." : "Search"}
           </button>
         </div>
-        
+
         {suggestions.length > 0 && (
           <div className="suggestions-box">
             <strong>AI Suggestions:</strong>
@@ -469,11 +622,9 @@ export default function Dashboard() {
                   key={i}
                   className="suggestion-tag"
                   onClick={() => {
-                    if (search.trim()) {
-                      setSearchTerms(prev => [...prev, search.toLowerCase()]);
-                    }
                     setSearch(suggestion);
                     setSuggestions([]);
+                    fetchSuggestions();
                   }}
                 >
                   {suggestion}
@@ -482,29 +633,46 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-        
-        <CSVLink
-          data={filteredStudents.map((student) => ({
-            RollNo: student.roll_no,
-            Name: student.name,
-            Branch: student.roll_no.slice(6, 9),
-            Year: student.roll_no.slice(5, 7),
-            Section: (() => {
-              const sectionIndicator = parseInt(student.roll_no.slice(9, 12));
-              if (sectionIndicator <= 70) return "1";
-              if (sectionIndicator <= 140) return "2";
-              return "3";
-            })(),
-            CGPA: student.CGPA,
-          }))}
-          filename="students_data.csv"
-          className="export-btn"
-        >
-          Export to CSV
-        </CSVLink>
+
+        <div className="action-buttons">
+          <label className="upload-btn">
+            <FiUpload className="btn-icon" />
+            {isUploading ? "Processing..." : "Upload Requirements"}
+            <input 
+              type="file" 
+              accept=".pdf,.doc,.docx" 
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+              disabled={isUploading}
+            />
+          </label>
+
+          <CSVLink
+            data={filteredStudents.map((student) => ({
+              RollNo: student.roll_no,
+              Name: student.name,
+              Email: student.email,
+              Branch: student.roll_no?.slice(6, 9),
+              Year: student.roll_no?.slice(4, 6),
+              Section: (() => {
+                const sectionIndicator = parseInt(student.roll_no?.slice(9, 12));
+                if (sectionIndicator <= 70) return "1";
+                if (sectionIndicator <= 140) return "2";
+                return "3";
+              })(),
+              CGPA: student.CGPA,
+              MatchPercentage: student.matchPercentage || 0,
+              MatchedSkills: student.matchedSkills?.join(", ") || ""
+            }))}
+            filename="students_data.csv"
+            className="export-btn"
+          >
+            <FiDownload className="btn-icon" />
+            Export CSV
+          </CSVLink>
+        </div>
       </div>
 
-      {/* Results */}
       <div className="student-grid">
         {filteredStudents.length > 0 ? (
           filteredStudents.map((student) => (

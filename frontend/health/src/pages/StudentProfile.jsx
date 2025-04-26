@@ -13,6 +13,16 @@ const StudentProfile = () => {
   const [requirements, setRequirements] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -92,7 +102,7 @@ const StudentProfile = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/generate-resume`, {
+      const response = await fetch("http://127.0.0.1:5000/generate-resume", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,15 +136,35 @@ const StudentProfile = () => {
     const pageHeight = doc.internal.pageSize.height;
     let y = 20;
 
+    // Student name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.text(personalData?.name || "Name Not Available", 105, y, null, null, "center");
     y += 10;
+
+    // Email
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.text(personalData?.email || "Email Not Available", 105, y, null, null, "center");
     y += 10;
 
+    // LinkedIn and GitHub if available
+    if (student.linkedin || student.github) {
+      let contactText = "";
+      if (student.linkedin && student.github) {
+        contactText = `LinkedIn: ${student.linkedin} | GitHub: ${student.github}`;
+      } else if (student.linkedin) {
+        contactText = `LinkedIn: ${student.linkedin}`;
+      } else {
+        contactText = `GitHub: ${student.github}`;
+      }
+      
+      doc.setFontSize(10);
+      doc.text(contactText, 105, y, null, null, "center");
+      y += 10;
+    }
+
+    // Resume content
     const lines = resume.split("\n");
 
     for (let i = 0; i < lines.length; i++) {
