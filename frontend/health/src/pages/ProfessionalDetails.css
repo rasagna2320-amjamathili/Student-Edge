@@ -1,0 +1,134 @@
+/* 🔹 Professional Details Container */
+.professional-details-container {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center vertically as well */
+  min-height: 100vh; /* Take full viewport height */
+  padding: 0; /* Remove padding */
+  box-sizing: border-box;
+  width: 100%;
+  background: none; /* Remove the background behind the white box */
+}
+
+/* 🔹 Professional Details Card */
+.professional-details-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px; /* Increased padding */
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  width: 1000px; /* Significantly increased width */
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px); /* Adjust for potential header/footer */
+  justify-content: flex-start; /* Align content to the top */
+}
+
+/* 🔹 Title */
+.professional-details-card h2 {
+  color: #8B7355; /* Brown color */
+  font-size: 28px; /* Increased font size */
+  margin-bottom: 30px; /* Increased margin */
+  text-align: center;
+  word-break: break-word;
+}
+
+/* 🔹 Details Label */
+.professional-details-card label {
+  display: block;
+  font-size: 18px; /* Increased font size */
+  color: #3D2C21; /* Dark brown color */
+  margin: 15px 0 5px 0; /* Increased margin */
+  text-align: left;
+  font-weight: bold;
+}
+
+/* 🔹 Details Input */
+.professional-details-card input[type="text"],
+.professional-details-card input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* 🔹 Button Group */
+.professional-details-card .button-group {
+  margin-top: auto; /* Push buttons to the bottom */
+  text-align: center;
+}
+
+/* 🔹 Update Button */
+.professional-details-card .update-btn {
+  background: #8B7355; /* Brown color */
+  color: white;
+  padding: 16px 28px; /* Further increased padding */
+  font-size: 20px; /* Further increased font size */
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 25px; /* Increased margin */
+}
+
+.professional-details-card .update-btn:hover {
+  background: #6B5D4D; /* Darker brown on hover */
+}
+
+/* 🔹 Back to Dashboard Link */
+.professional-details-card .back-to-dashboard {
+  display: block;
+  margin-top: 30px; /* Increased margin */
+  text-align: center;
+  color: #007bff; /* Keep blue for link (or change to a template link color) */
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 20px; /* Further increased font size */
+}
+
+.professional-details-card .back-to-dashboard:hover {
+  color: #0056b3; /* Darker shade for hover */
+}
+
+/* 🔹 Profile Picture Display */
+.profile-pic-display {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px; /* Increased margin */
+  position: relative; /* For positioning the edit icon */
+}
+
+.profile-pic-display img,
+.profile-pic-display div {
+  width: 180px !important; /* Increased size */
+  height: 180px !important; /* Increased size */
+  border-radius: 50%;
+  object-fit: cover;
+  font-size: 2.5em !important; /* Increased placeholder font size */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ddd; /* Placeholder background color */
+  color: #777; /* Placeholder text color */
+}
+
+.profile-pic-display .edit-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  padding: 8px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1; /* Ensure it's above the image */
+}
+
+.profile-pic-display .edit-icon:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}

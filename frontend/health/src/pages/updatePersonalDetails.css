@@ -1,0 +1,146 @@
+
+/* Base container styling - can be shared or slightly different */
+.personal-details-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(to right, #ffecd2, #fcb69f);
+}
+
+.personal-details-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  width: 600px;
+  max-width: 95%;
+  text-align: center;
+}
+
+.personal-details-card h2 {
+  color: #e67e22;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.personal-details-card label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #555;
+  text-align: left;
+}
+
+.personal-details-card input[type="text"],
+.personal-details-card input[type="number"],
+.personal-details-card input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.personal-details-card button {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.personal-details-card button:hover {
+  background-color: #2980b9;
+}
+
+/* Styling for the profile picture section */
+.personal-details-card .photo-section {
+  width: 100px;
+  height: 100px;
+  background: #7f8c8d;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.personal-details-card .profile-pic-container {
+  position: relative;
+  margin-bottom: 15px;
+  width: 100px;
+  height: 100px;
+}
+
+.personal-details-card .profile-pic-circle {
+  width: 100%;
+  height: 100%;
+  background-color: #7f8c8d;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.personal-details-card .profile-pic {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+.personal-details-card .placeholder-text {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.personal-details-card .edit-icon {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  padding: 6px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.personal-details-card .edit-icon:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+#DOBLabel{
+  margin-bottom:10px;
+}
+#DOB{
+  margin-top:20px;
+}
+
+/* Specific styling for the profile picture to override other styles */
+.personal-details-card .profile-pic-container {
+    width: 120px;  /* Increased size to override any smaller size */
+    height: 120px; /* Increased size to override any smaller size */
+}
+
+.personal-details-card .profile-pic-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+

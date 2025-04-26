@@ -14,7 +14,7 @@
 .profile-card {
     background: rgba(255, 255, 255, 0.95);
     padding: 40px;
-    width: 100% !important;
+
     max-width: 1000px;
     min-height: 80vh;
     border-radius: 18px;
@@ -25,6 +25,7 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
+    text-align: center;
 }
 
 /* 🔹 Title */
@@ -55,36 +56,37 @@ p {
     margin-bottom: 20px;
     background: #FFFFFF;
     width: 100%;
-    height: 100%;
+    height: auto;
+    flex-direction: column;
 }
 
-/* 🔹 Profile Picture Container */
+/* 🔹 Profile Picture Container - Reduced Size */
 .profile-pic-container {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 120px; /* Adjusted to a more common size */
+    height: 120px; /* Adjusted to a more common size */
     border-radius: 50%;
     overflow: hidden;
-    border: 3px solid #8B7355;
+    border: 2px solid #8B7355;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #E0C6A8;
 }
 
-/* 🔹 Profile Picture Image */
+/* 🔹 Profile Picture Image - Ensure it fills the container */
 .profile-pic {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 40%; /* Make it take the full width of the container */
+    height: 40%; /* Make it take the full height of the container */
+    object-fit: cover; /* This will scale the image to cover the container, potentially cropping some parts */
     display: block;
     margin: 0 auto;
 }
 
-/* 🔹 Placeholder Text When No Picture */
+/* 🔹 Placeholder Text When No Picture - Adjust font size if needed */
 .placeholder-text {
     color: #8B7355;
-    font-size: 18px;
+    font-size: 18px; /* Adjusted font size for better visibility */
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -92,33 +94,40 @@ p {
 /* 🔹 Edit Icon */
 .edit-icon {
     position: absolute;
-    right: 10px;
+    right: 0px; /* Align to the right edge */
+    bottom: 0px; /* Align to the bottom edge */
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     border-radius: 50%;
-    padding: 5px;
+    padding: 6px; /* Adjusted padding */
     cursor: pointer;
+    font-size: 0.8em; /* Adjusted font size */
 }
 
 /* 🔹 Button Group (Center Align the Buttons) */
 .button-group {
     margin-top: 20px;
     text-align: center;
+    margin-right: 20px;
+    display: flex; /* Use flexbox to control button spacing */
+    justify-content: center; /* Center buttons horizontally */
+    flex-wrap: wrap; /* Allow buttons to wrap to the next line on smaller screens */
 }
 
-/* 🔹 Back to Dashboard Button */
+/* 🔹 Back to Dashboard Button and Generate Resume Button */
 .update-btn,
 .generate-resume-btn {
     background: #8B7355;
     color: white;
-    padding: 14px 20px;
+    padding: 12px 16px; /* Slightly reduced padding */
     font-size: 16px;
     font-weight: bold;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.3s ease;
-    margin: 10px 0;
+    margin: 5px 10px;
+    text-decoration: none !important;
 }
 
 .update-btn:hover,
@@ -148,7 +157,6 @@ textarea {
 }
 
 /* 🔹 Resume Output */
-/* 🔹 Resume Output */
 .resume-output {
     margin-top: 20px;
     padding: 15px;
@@ -159,22 +167,22 @@ textarea {
     white-space: pre-wrap;
     word-break: break-word;
     overflow-wrap: break-word;
-    overflow-x: auto;           /* ✅ Enables horizontal scrolling for long lines */
-    max-width: 100%;            /* ✅ Prevents it from exceeding parent width */
-    box-sizing: border-box;     /* ✅ Includes padding in width calc */
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
-
-/* 🔹 Buttons */
+/* 🔹 Buttons (General Styling) */
 button {
-    padding: 14px 18px;
+    padding: 12px 16px;
     font-size: 16px;
     font-weight: bold;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-    margin: 8px;
+    margin: 5px 10px;
+    text-decoration: none !important;
 }
 
 /* Primary Button */
@@ -209,24 +217,31 @@ button {
         height: 100px;
     }
 
-    button {
-        width: 100%;
-        padding: 12px;
+    button,
+    .update-btn,
+    .generate-resume-btn {
+        width: auto;
+        padding: 10px 14px;
+        margin: 5px;
+    }
+
+    .button-group {
+        margin-right: 0;
     }
 }
-/* Profile Card Styling - Increased Size */
+/* Profile Card Styling - Increased Size (Reverted to original to maintain layout) */
 .profile-card {
     background: rgba(255, 255, 255, 0.95);
-    padding: 30px; /* Increased padding */
+    padding: 40px;
     border-radius: 14px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    width: 500px; /* Increased width */
+    width: 700px;
     text-align: center;
-  }
+}
 
-  /* ☰ Kebab Menu Styling */
+/* ☰ Kebab Menu Styling (No changes requested) */
 .kebab-menu {
-    position: absolute; /* To position it in the top right of the card */
+    position: absolute;
     top: 20px;
     right: 20px;
     display: flex;
@@ -236,43 +251,119 @@ button {
     height: 20px;
     cursor: pointer;
     padding: 5px;
-  }
-  
-  .kebab-menu span {
+}
+
+.kebab-menu span {
     display: block;
     width: 5px;
     height: 5px;
-    background-color: #8B7355; /* Match your theme color */
+    background-color: #8B7355;
     border-radius: 50%;
-  }
-  
-  /* Menu Options Styling */
-  .menu-options {
+}
+
+/* Menu Options Styling (No changes requested) */
+.menu-options {
     position: absolute;
-    top: 50px; /* Adjust based on the position of the kebab menu */
+    top: 50px;
     right: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 10px 0;
-    z-index: 100; /* Ensure it's above other elements */
+    z-index: 100;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .menu-options a,
-  .menu-options button {
+}
+
+.menu-options a,
+.menu-options button {
     display: block;
     padding: 8px 20px;
     text-decoration: none;
-    color: #3D2C21; /* Match your text color */
+    color: #3D2C21;
     text-align: left;
     border: none;
     background: none;
     cursor: pointer;
     font-size: 16px;
-  }
-  
-  .menu-options a:hover,
-  .menu-options button:hover {
+}
+
+.menu-options a:hover,
+.menu-options button:hover {
     background-color: #eee;
+}
+
+/* 🔹 Profile Picture Section (Re-applied to ensure correct styling) */
+.photo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    background: #FFFFFF;
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+}
+
+/* 🔹 Profile Picture Container - Reduced Size (Re-applied) */
+.profile-pic-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #8B7355;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #E0C6A8;
+}
+
+/* 🔹 Profile Picture Image - Ensure it fills the container */
+.profile-pic {
+    width: 40%; /* Take full width */
+    height: 40%; /* Take full height */
+    object-fit: cover; /* Scale and crop to fill */
+    display: block;
+    margin: 0 auto;
+}
+
+/* 🔹 Placeholder Text When No Picture - Adjust font size if needed */
+.placeholder-text {
+    color: #8B7355;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+#Details{
+    margin-top: 20px;
+    padding: 20px;
+    background: #FAF3E0;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 16px;
+    color: #3D2C21;
+    white-space: pre-wrap; /* Preserve whitespace */
+    overflow-wrap: break-word; /* Break long words */
+    word-break: break-word; /* Break words at the end of the line */
+    padding-left: 170px;
+    padding-right: 170px;
+}
+#Details div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
+ #student-profile-header{
+    display:block;
+    text-align: center;;
+    background-color: #d9b38c; /* Light brown header */
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+ }
+ #student-profile-header h2{
+    color: #3D2C21; /* Dark brown text */
+    font-size: 28px;
+    margin: 0;
+    font-weight: bold;
+ }

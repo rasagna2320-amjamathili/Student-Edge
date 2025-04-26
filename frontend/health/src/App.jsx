@@ -19,20 +19,3 @@ function ConditionalNavbar() {
 
 export default App;
 
-/*
-
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Test from "./Test";
-import StudentHome from "./pages/StudentHome";
-const App = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Test />} />
-      <Route path="/student-home" element={<StudentHome />} />
-    </Routes>
-  );
-};
-
-export default App;
-*/
