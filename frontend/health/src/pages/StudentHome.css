@@ -13,20 +13,20 @@
 /* Profile Card Styling - Increased Size */
 .profile-card {
   background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
+  padding: 40px; /* Increased padding */
   border-radius: 14px;
-  /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); */
-  width: 500px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  width: 600px; /* Further increased width for better readability */
   text-align: center;
 }
 
 /* Profile Picture Placeholder */
 .photo-section {
-  width: 120px;
-  height: 120px;
-  background: #3a6073;
+  width: 140px; /* Slightly larger */
+  height: 140px; /* Slightly larger */
+  background: #8B7355; /* Brown color */
   border-radius: 50%;
-  margin: 0 auto 15px;
+  margin: 0 auto 20px; /* Increased margin */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,15 +40,15 @@
   justify-content: center !important;
   align-items: center !important;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 25px; /* Increased margin */
 }
 
 .profile-pic-circle {
-  width: 120px;
-  height: 120px;
-  background-color: #3a6073;
+  width: 140px; /* Slightly larger */
+  height: 140px; /* Slightly larger */
+  background-color: #8B7355; /* Brown color */
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 15px; /* Increased margin */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,29 +61,23 @@
 .profile-pic {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover; /* Changed to cover for better fit in circle */
   border-radius: 50%;
 }
 
 /* Placeholder text inside the circle if no image is selected */
 .placeholder-text {
   color: white;
-  font-size: 18px;
+  font-size: 20px; /* Slightly larger */
   font-weight: bold;
 }
 
 .edit-icon {
   position: absolute;
-  /* top:0px !important; */
-  /*right:0px !important;*/
-
-  bottom: -5px  !important;
-  right: -5px   !important;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  bottom: 5px !important; /* Adjusted position */
+  right: 5px !important; /* Adjusted position */
+  background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
+  border-radius: 50%; /* Make it fully circular */
   padding: 8px;
   color: white !important;
   font-size: 18px;
@@ -92,75 +86,70 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px; /* Slightly larger */
+  height: 36px; /* Slightly larger */
 }
 
 .edit-icon:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 /* Form Heading (Skills, Certifications, etc.) - Darker for visibility */
 .form-container h2 {
   text-align: center;
-  color: #0b3d91;
-  font-size: 22px;
+  color:#bf6c35 ; /* Dark brown color */
+  font-size: 24px; /* Slightly larger */
   font-weight: bold;
-  margin-bottom: 15px;
+  margin-bottom: 20px; /* Increased margin */
 }
 
 /* Labels - Now Darker for Better Visibility */
 label {
   display: block;
-  margin-top: 12px;
+  margin-top: 15px; /* Increased margin */
   font-weight: bold;
-  color: #0b3d91;
+  color: #3D2C21; /* Dark brown color */
+  font-size: 18px; /* Slightly larger */
 }
 
 /* Input Fields Styling - Increased Padding */
 input[type="text"] {
   width: 100%;
-  padding: 10px;
-  margin: 5px 0 15px;
+  padding: 12px; /* Increased padding */
+  margin: 8px 0 20px; /* Increased margin */
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   font-size: 16px;
+  box-sizing: border-box;
 }
 
 /* Submit Button Styling */
 .submit-btn {
-  background-color: #1abc9c;
+  background-color: #8B7355; /* Brown color */
   color: white;
-  padding: 12px 30px;
+  padding: 14px 35px; /* Increased padding */
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
+  border-radius: 8px;
+  font-size: 18px; /* Slightly larger */
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .submit-btn:hover {
-  background-color: #148f77;
+  background-color: #6B5D4D; /* Darker brown on hover */
 }
 
 /* Add Field Button Styling */
 .add-field-btn {
-  background-color: #f39c12;
+  background-color: #a0855b; /* Slightly lighter brown */
   color: white;
-  padding: 8px 20px;
+  padding: 10px 25px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .add-field-btn:hover {
-  background-color: #e67e22;
-}
-/* Profile Card Styling - Increased Size */
-.profile-card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px; /* Increased padding */
-  border-radius: 14px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); 
-  width: 500px; /* Increased width */
-  text-align: center;
+  background-color: #776342; /* Darker shade */
 }

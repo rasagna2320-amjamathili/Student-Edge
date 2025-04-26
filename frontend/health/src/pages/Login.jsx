@@ -34,13 +34,14 @@ const Login = () => {
       }
 
       localStorage.setItem("token", res.data.token);
-      
-      const studentRes = await axios.get(`${BASE_URL}/api/students/profile`, {
-        headers: { Authorization: `Bearer ${res.data.token}` },
-      });
 
-      localStorage.setItem("user", JSON.stringify(studentRes.data));
-      navigate("/student-profile");
+      // REMOVE THIS ENTIRE BLOCK:
+      // const studentRes = await axios.get(`${BASE_URL}/api/students/profile`, {
+      //   headers: { Authorization: `Bearer ${res.data.token}` },
+      // });
+      // localStorage.setItem("user", JSON.stringify(studentRes.data));
+
+      navigate("/student-profile"); // Navigate to the dashboard after successful login
     } catch (error) {
       alert(error.response?.data?.error || "Login failed.");
     } finally {

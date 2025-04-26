@@ -4,11 +4,14 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "./StudentProfile.css";
 
+const BASE_URL = "http://localhost:5000"; // Base URL for API requests
 const StudentProfile = () => {
-  const [student, setStudent] = useState(null);
+  const [personalData, setPersonalData] = useState(null);
+  const [professionalData, setProfessionalData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [resume, setResume] = useState("");
   const [requirements, setRequirements] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -21,35 +24,73 @@ const StudentProfile = () => {
     navigate("/login");
   };
 
+
   useEffect(() => {
-    const fetchStudentData = async () => {
+    const fetchProfileData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const response = await fetch("http://localhost:5000/api/students/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+        const response = await fetch(`${BASE_URL}/api/students/profile`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
-        setStudent(data);
-      } catch (error) {
-        console.error("Error fetching student data:", error);
+        setPersonalData(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching profile data:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchStudentData();
+
+    fetchProfileData();
   }, []);
 
-  const handleUpdateProfile = () => {
-    if (student) {
-      navigate("/student-home", { state: { studentData: student } });
+  if (loading) {
+    return <div>Loading profile...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading profile: {error}</div>;
+  }
+
+  const fetchResumeData = async () => {
+    setLoading(true);
+    try {
+      const personalResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/personal-details`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      const personal = await personalResponse.json();
+      setPersonalData(personal);
+
+      const professionalResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/professional-details`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      const professional = await professionalResponse.json();
+      setProfessionalData(professional);
+
+      if (!personalResponse.ok || !professionalResponse.ok) {
+        throw new Error("Failed to fetch data for resume");
+      }
+    } catch (error) {
+      console.error("Error fetching data for resume:", error);
+      // Consider setting an error state
+    } finally {
+      setLoading(false);
     }
   };
 
   const generateResume = async () => {
-    if (!student) return;
-    setLoading(true);
+    await fetchResumeData(); // Fetch both personal and professional data
 
+    if (!personalData || !professionalData) {
+      return; // Don't proceed if data fetching failed
+    }
+
+    setLoading(true);
     try {
       const response = await fetch("http://127.0.0.1:5000/generate-resume", {
         method: "POST",
@@ -58,20 +99,16 @@ const StudentProfile = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          student_data: {
-            ...student,
-            linkedin: student.linkedin || "",
-            github: student.github || "",
-          },
+          personalData: personalData,
+          professionalData: professionalData,
           requirements: requirements,
         }),
       });
-
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setResume(data.resume);
+      const data = await response.text();
+      setResume(data);
     } catch (error) {
       console.error("Error generating resume:", error);
       setResume("Error generating resume. Please try again.");
@@ -81,7 +118,7 @@ const StudentProfile = () => {
   };
 
   const downloadResumeAsPDF = () => {
-    if (!resume || !student) return;
+    if (!resume || !personalData || !professionalData) return;
 
     const doc = new jsPDF();
     const margin = 15;
@@ -92,13 +129,13 @@ const StudentProfile = () => {
     // Student name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text(student.name, 105, y, null, null, "center");
+    doc.text(personalData?.name || "Name Not Available", 105, y, null, null, "center");
     y += 10;
 
     // Email
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(student.email, 105, y, null, null, "center");
+    doc.text(personalData?.email || "Email Not Available", 105, y, null, null, "center");
     y += 10;
 
     // LinkedIn and GitHub if available
@@ -119,6 +156,7 @@ const StudentProfile = () => {
 
     // Resume content
     const lines = resume.split("\n");
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
@@ -141,69 +179,45 @@ const StudentProfile = () => {
       });
     }
 
-    doc.save(`${student.name.replace(/\s+/g, "_")}_Resume.pdf`);
+    doc.save(`${(personalData?.name || "Student").replace(/\s+/g, "_")}_Resume.pdf`);
   };
 
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <div className="kebab-menu" onClick={toggleMenu}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        {isMenuOpen && (
-          <div className="menu-options">
-            <Link to="/change-password">Change Password</Link>
-            <button onClick={handleLogout}>Logout</button>
+        <div className="profile-header" id = "student-profile-header">
+        <h2>Welcome, {personalData?.name || "Student"}</h2>
+          {personalData?.profilePicture && (
+            <img
+              src={personalData.profilePicture}
+              alt="Profile Picture"
+              className="profile-pic"
+              width="20" // Adjust this value as needed
+              height="20" // Adjust this value as needed
+            />
+          )}
+        
+        <div id="Details">
+            <p>
+              <strong>Roll Number:</strong> {personalData?.roll_no || "-"}
+            </p>
+            <p>
+              <strong>Current Year:</strong> {personalData?.currentYear || "-"}
+            </p>
+            <p>
+              <strong>Current Semester:</strong> {personalData?.currentSemester || "-"}
+            </p>
           </div>
-        )}
-        <h2>Student Profile</h2>
-        {loading ? (
-          <p>Loading student details...</p>
-        ) : student ? (
-          <>
-            <div className="profile-section">
-              <div className="profile-pic-container">
-                {student?.profilePicture ? (
-                  <img src={student.profilePicture} alt="Profile" className="profile-pic" />
-                ) : (
-                  <span className="placeholder-text">Profile</span>
-                )}
-              </div>
-            </div>
-            <p><strong>Name:</strong> {student.name || "-"}</p>
-            <p><strong>Roll No:</strong> {student.roll_no || "-"}</p>
-            <p><strong>Email:</strong> {student.email || "-"}</p>
-            {student.linkedin && (
-              <p><strong>LinkedIn:</strong> 
-                <a href={student.linkedin} target="_blank" rel="noopener noreferrer">
-                  {student.linkedin}
-                </a>
-              </p>
-            )}
-            {student.github && (
-              <p><strong>GitHub:</strong> 
-                <a href={student.github} target="_blank" rel="noopener noreferrer">
-                  {student.github}
-                </a>
-              </p>
-            )}
-            <p><strong>CGPA:</strong> {student.CGPA}</p>
-            <p><strong>Skills:</strong> {student.skills?.length ? student.skills.join(", ") : "-"}</p>
-            <p><strong>Certifications:</strong> {student.certifications?.length ? student.certifications.join(", ") : "-"}</p>
-            <p><strong>Participated Tech Events:</strong> {student.participatedTechEvents?.length ? student.participatedTechEvents.join(", ") : "-"}</p>
-            <p><strong>Extra-Curricular Activities:</strong> {student.extraCurricularActivities?.length ? student.extraCurricularActivities.join(", ") : "-"}</p>
-            <p><strong>Co-Curricular Activities:</strong> {student.coCurricularActivities?.length ? student.coCurricularActivities.join(", ") : "-"}</p>
-            <p><strong>Additional Fields:</strong> {student.additionalFields?.length ? student.additionalFields.join(", ") : "-"}</p>
-          </>
-        ) : (
-          <p>No student data found!</p>
-        )}
+        </div>
+
+          
         <div className="button-group">
-          <button className="update-btn" onClick={handleUpdateProfile}>
-            Update Profile
-          </button>
+          <Link to="/personal-details" className="update-btn">
+            Background Details
+          </Link>
+          <Link to="/professional-details" className="update-btn">
+            Present Profile
+          </Link>
         </div>
         <div className="resume-section">
           <h3>Generate Resume</h3>
@@ -226,6 +240,17 @@ const StudentProfile = () => {
             </div>
           )}
         </div>
+        <div className="kebab-menu" onClick={toggleMenu}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        {isMenuOpen && (
+          <div className="menu-options">
+            <Link to="/change-password">Change Password</Link>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        )}
       </div>
     </div>
   );
