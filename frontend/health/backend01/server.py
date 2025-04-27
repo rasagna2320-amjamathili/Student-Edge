@@ -433,14 +433,22 @@ def generate_resume():
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        # Extract student data
-        student_data = data.get("student_data")
+        # ❌ Don't get student_data
+        # ✅ Get student_id
+        student_id = data.get("student_id")
         requirements = data.get("requirements", "")
-        
-        if not student_data:
-            return jsonify({"error": "No student data provided"}), 400
 
-        # Branch mapping
+        if not student_id:
+            return jsonify({"error": "No student ID provided"}), 400
+
+        # ✅ Now fetch the student from MongoDB
+        student_oid = ObjectId(student_id)
+        student_data = students_collection.find_one({"_id": student_oid})
+
+        if not student_data:
+            return jsonify({"error": "Student not found"}), 404
+
+        # ✨ Now you can continue to generate resume using student_data
         branch_code = student_data.get("roll_no", "000")[6:9]
         branch_map = {
             "737": "Information Technology",
@@ -453,7 +461,6 @@ def generate_resume():
         }
         branch_name = branch_map.get(branch_code, "Engineering")
 
-        # Prepare prompt for DeepSeek
         prompt = f"""
         Create a professional resume using the following student data.
         
@@ -489,7 +496,7 @@ def generate_resume():
         EXTRA-CURRICULAR: {", ".join(student_data.get("extraCurricularActivities", [])) or "None"}
         """
 
-        # Call DeepSeek API
+        # DeepSeek AI call
         response = client.chat.completions.create(
             model="deepseek/deepseek-chat",
             messages=[{"role": "user", "content": prompt}],
@@ -499,21 +506,19 @@ def generate_resume():
         
         resume_text = response.choices[0].message.content.strip()
 
-        # Add education section at the beginning
         education_section = f"""
 Chaitanya Bharathi Institute of Technology (CBIT)
 Bachelor of Technology in {branch_name} (Pursuing)
 CGPA: {student_data.get("CGPA", "N/A")}
 
 """
-        
-        # Insert LinkedIn and GitHub under email if available
+
         contact_info = []
         if student_data.get("linkedin"):
             contact_info.append(f"LinkedIn: {student_data['linkedin']}")
         if student_data.get("github"):
             contact_info.append(f"GitHub: {student_data['github']}")
-        
+
         if contact_info:
             resume_text = resume_text.replace(
                 "SUMMARY",
@@ -533,6 +538,7 @@ CGPA: {student_data.get("CGPA", "N/A")}
             "error": "Failed to generate resume",
             "details": str(e)
         }), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
