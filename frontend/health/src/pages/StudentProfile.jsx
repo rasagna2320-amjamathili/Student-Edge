@@ -5,6 +5,7 @@ import "jspdf-autotable";
 import "./StudentProfile.css";
 
 const BASE_URL = "http://localhost:5000"; // Base URL for API requests
+
 const StudentProfile = () => {
   const [personalData, setPersonalData] = useState(null);
   const [professionalData, setProfessionalData] = useState(null);
@@ -24,7 +25,6 @@ const StudentProfile = () => {
     navigate("/login");
   };
 
-
   useEffect(() => {
     const fetchProfileData = async () => {
       setLoading(true);
@@ -37,7 +37,8 @@ const StudentProfile = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setPersonalData(data);
+        setPersonalData(data); // Store all profile data including email, linkedin, github
+
       } catch (err) {
         setError(err.message);
         console.error("Error fetching profile data:", err);
@@ -77,20 +78,15 @@ const StudentProfile = () => {
       }
     } catch (error) {
       console.error("Error fetching data for resume:", error);
-      // Consider setting an error state
     } finally {
       setLoading(false);
     }
   };
 
   const generateResume = async () => {
-    await fetchResumeData(); // Fetch both personal and professional data
-
-    if (!personalData || !professionalData) {
-      return; // Don't proceed if data fetching failed
-    }
-
+    if (!personalData?._id) return;
     setLoading(true);
+
     try {
       const response = await fetch("http://127.0.0.1:5000/generate-resume", {
         method: "POST",
@@ -99,16 +95,16 @@ const StudentProfile = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          personalData: personalData,
-          professionalData: professionalData,
+          student_id: personalData._id, // Send student _id
           requirements: requirements,
         }),
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
       }
-      const data = await response.text();
-      setResume(data);
+      setResume(data.resume); // Set only resume text, not the whole object
     } catch (error) {
       console.error("Error generating resume:", error);
       setResume("Error generating resume. Please try again.");
@@ -118,7 +114,7 @@ const StudentProfile = () => {
   };
 
   const downloadResumeAsPDF = () => {
-    if (!resume || !personalData || !professionalData) return;
+    if (!resume || !personalData) return;
 
     const doc = new jsPDF();
     const margin = 15;
@@ -129,26 +125,26 @@ const StudentProfile = () => {
     // Student name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text(personalData?.name || "Name Not Available", 105, y, null, null, "center");
+    doc.text(personalData.name || "Student", 105, y, null, null, "center");
     y += 10;
 
     // Email
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(personalData?.email || "Email Not Available", 105, y, null, null, "center");
+    doc.text(personalData.email || "Email Not Available", 105, y, null, null, "center");
     y += 10;
 
     // LinkedIn and GitHub if available
-    if (student.linkedin || student.github) {
+    if (personalData.linkedin || personalData.github) {
       let contactText = "";
-      if (student.linkedin && student.github) {
-        contactText = `LinkedIn: ${student.linkedin} | GitHub: ${student.github}`;
-      } else if (student.linkedin) {
-        contactText = `LinkedIn: ${student.linkedin}`;
+      if (personalData.linkedin && personalData.github) {
+        contactText = `LinkedIn: ${personalData.linkedin} | GitHub: ${personalData.github}`;
+      } else if (personalData.linkedin) {
+        contactText = `LinkedIn: ${personalData.linkedin}`;
       } else {
-        contactText = `GitHub: ${student.github}`;
+        contactText = `GitHub: ${personalData.github}`;
       }
-      
+
       doc.setFontSize(10);
       doc.text(contactText, 105, y, null, null, "center");
       y += 10;
@@ -156,7 +152,6 @@ const StudentProfile = () => {
 
     // Resume content
     const lines = resume.split("\n");
-
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
@@ -174,19 +169,19 @@ const StudentProfile = () => {
 
       const splitLines = doc.splitTextToSize(line, 180);
       splitLines.forEach((l) => {
-        doc.text(l, margin, y);
+        doc.text(margin, y, l);
         y += lineHeight;
       });
     }
 
-    doc.save(`${(personalData?.name || "Student").replace(/\s+/g, "_")}_Resume.pdf`);
+    doc.save(`${(personalData.name || "Student").replace(/\s+/g, "_")}_Resume.pdf`);
   };
 
   return (
     <div className="profile-container">
       <div className="profile-card">
-        <div className="profile-header" id = "student-profile-header">
-        <h2>Welcome, {personalData?.name || "Student"}</h2>
+        <div className="profile-header" id="student-profile-header">
+          <h2>Welcome, {personalData?.name || "Student"}</h2>
           {personalData?.profilePicture && (
             <img
               src={personalData.profilePicture}
@@ -196,8 +191,7 @@ const StudentProfile = () => {
               height="20" // Adjust this value as needed
             />
           )}
-        
-        <div id="Details">
+          <div id="Details">
             <p>
               <strong>Roll Number:</strong> {personalData?.roll_no || "-"}
             </p>
@@ -207,10 +201,24 @@ const StudentProfile = () => {
             <p>
               <strong>Current Semester:</strong> {personalData?.currentSemester || "-"}
             </p>
+            {personalData?.email && (
+              <p>
+                <strong>Email:</strong> {personalData.email}
+              </p>
+            )}
+            {personalData?.linkedin && (
+              <p>
+                <strong>LinkedIn:</strong> <a href={personalData.linkedin} target="_blank" rel="noopener noreferrer">{personalData.linkedin}</a>
+              </p>
+            )}
+            {personalData?.github && (
+              <p>
+                <strong>GitHub:</strong> <a href={personalData.github} target="_blank" rel="noopener noreferrer">{personalData.github}</a>
+              </p>
+            )}
           </div>
         </div>
 
-          
         <div className="button-group">
           <Link to="/personal-details" className="update-btn">
             Background Details
@@ -219,6 +227,7 @@ const StudentProfile = () => {
             Present Profile
           </Link>
         </div>
+
         <div className="resume-section">
           <h3>Generate Resume</h3>
           <textarea
@@ -240,11 +249,13 @@ const StudentProfile = () => {
             </div>
           )}
         </div>
+
         <div className="kebab-menu" onClick={toggleMenu}>
           <span></span>
           <span></span>
           <span></span>
         </div>
+
         {isMenuOpen && (
           <div className="menu-options">
             <Link to="/change-password">Change Password</Link>
