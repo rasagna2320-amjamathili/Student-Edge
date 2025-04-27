@@ -13,7 +13,9 @@ import tempfile
 import io
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+#CORS(app, resources={r"/generate-resume": {"origins": "*"}})
+CORS(app)
+
 
 # Configure MongoDB
 MONGO_URI = "mongodb+srv://rasagna2023:MongoDB_password@cluster0.g8rue.mongodb.net/studentEdgeDB?retryWrites=true&w=majority&appName=Cluster0"
@@ -72,7 +74,7 @@ def process_document_with_deepseek(text):
     3. Include programming languages, databases, frameworks, tools, etc.
     4. Return a comprehensive list without omitting any technical requirements
     5. Output MUST be in strict JSON format as specified below
-    6. Do NOT include any markdown (e.g., ```json) or additional text outside the JSON
+    6. Do NOT include any markdown (e.g., json) or additional text outside the JSON
 
     DOCUMENT CONTENT:
     {text}
@@ -102,8 +104,8 @@ def process_document_with_deepseek(text):
         raw_response = response.choices[0].message.content.strip()
         logger.info(f"Raw DeepSeek response: {raw_response}")  # Log raw response for debugging
 
-        # Remove ```json markers if present
-        cleaned_response = raw_response.replace("```json", "").replace("```", "").strip()
+        # Remove json markers if present
+        cleaned_response = raw_response.replace("json", "").replace("", "").strip()
         if not cleaned_response:
             raise ValueError("Empty response after cleaning")
 
@@ -226,96 +228,81 @@ def generate_deepseek_response(query):
     Given this search query: "{query}"
 
     TASKS:
-    1. Correct any typos. For example: "artificil inteligence" → "Artificial Intelligence"
-    2. If the query is an abbreviation (e.g., "AI", "ML"), expand it (e.g., "Artificial Intelligence", "Machine Learning")
-    3. If the query is a full form (e.g., "Artificial Intelligence"), include its abbreviation too ("AI").
-    4. Filter out unrelated or general words. Focus only on terms related to CSE, ECE, EEE, IT (technical fields).
-    5. Ensure matches are EXACT standalone terms only, not substrings within unrelated words.
-       For example, "AI" should NOT match "Chaitanya", "Blockchain", or "Chain".
-    6. ALWAYS include both the abbreviation AND the full form in suggestions.
-    7. Split multi-word queries (e.g., "AI ML Python") into individual terms and process each separately.
-
+    1. MOST IMPORTANT: Correct any typos in both individual words and multi-word technical terms.
+    2. Identify all technical terms in the query, both single words and multi-word phrases.
+    3. For each technical term:
+       a. If it's an abbreviation, provide its full form
+       b. If it's a full form (possibly with typos), provide its abbreviation
+    4. Handle the query as COMPLETE PHRASES first, then as individual words
+    5. Focus only on terms related to computer science, engineering, and IT fields
+    
     OUTPUT FORMAT (strict JSON):
     {{
         "original_query": "{query}",
-        "corrected_query": "corrected query",
+        "corrected_query": "corrected query with all typos fixed",
         "expanded_terms": ["Expanded Full Term 1", "Expanded Full Term 2"],
         "abbreviations": ["Abbr1", "Abbr2"],
         "all_suggestions": ["All words to be matched for search"]
     }}
-
+    
     Examples:
-    - Input: "artificil inteligence" → Output includes ["AI", "Artificial Intelligence"]
-    - Input: "AI" → Output includes ["AI", "Artificial Intelligence"]
-    - Input: "Machine Learning" → Output includes ["ML", "Machine Learning"]
-    - Input: "ai ml python" → Output includes ["AI", "Artificial Intelligence", "ML", "Machine Learning", "Python"]
+    - For typos in technical terms, correct them and provide both forms
+    - For abbreviations, provide their full forms 
+    - For full terms (even with typos), provide their abbreviations
+    - Always normalize capitalization appropriately
     """
 
     try:
         response = client.chat.completions.create(
             model="deepseek/deepseek-chat",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=200
+            max_tokens=300,
+            temperature=0.1  # Lower temperature for more precise responses
         )
         cleaned_response = response.choices[0].message.content.strip()
+        logger.info(f"DeepSeek search response: {cleaned_response}")
+        
+        # Remove JSON code blocks if present
+        if "json" in cleaned_response:
+            cleaned_response = cleaned_response.split("json")[1].split("")[0]
+        elif "" in cleaned_response:
+            cleaned_response = cleaned_response.split("")[1].split("")[0]
+            
         parsed = json.loads(cleaned_response)
 
-        # Split query into individual terms
-        query_terms = query.lower().strip().split()
+        # Ensure all required fields are present
+        for field in ["corrected_query", "expanded_terms", "abbreviations", "all_suggestions"]:
+            if field not in parsed:
+                parsed[field] = [] if field != "corrected_query" else query
 
-        # Initialize output fields
-        parsed["expanded_terms"] = parsed.get("expanded_terms", [])
-        parsed["abbreviations"] = parsed.get("abbreviations", [])
-        parsed["all_suggestions"] = parsed.get("all_suggestions", [])
+        # Ensure corrected_query is populated
+        if not parsed["corrected_query"]:
+            parsed["corrected_query"] = query
 
-        # Process each query term
-        for term in query_terms:
-            term = term.strip()
-            if not term:
-                continue
-
-            # Check if term is an abbreviation
-            if term.upper() in abbreviation_map:
-                full_form = abbreviation_map[term.upper()]
-                if full_form not in parsed["expanded_terms"]:
-                    parsed["expanded_terms"].append(full_form)
-                if term.upper() not in parsed["abbreviations"]:
-                    parsed["abbreviations"].append(term.upper())
-            # Check if term is a full form
-            elif term.lower() in reverse_map:
-                abbr = reverse_map[term.lower()]
-                if term not in parsed["expanded_terms"]:
-                    parsed["expanded_terms"].append(term)
-                if abbr not in parsed["abbreviations"]:
-                    parsed["abbreviations"].append(abbr)
-            # Add term as-is if not in maps (e.g., "Python")
-            else:
-                if term not in parsed["all_suggestions"]:
-                    parsed["all_suggestions"].append(term)
-
-        # Ensure all_suggestions includes everything
-        parsed["all_suggestions"] = list(set(
-            parsed["expanded_terms"] +
-            parsed["abbreviations"] +
-            parsed["all_suggestions"]
-        ))
-
-        # Remove any empty or invalid entries
-        parsed["all_suggestions"] = [s for s in parsed["all_suggestions"] if s]
-        parsed["expanded_terms"] = [s for s in parsed["expanded_terms"] if s]
-        parsed["abbreviations"] = [s for s in parsed["abbreviations"] if s]
-
+        # Ensure no duplicates and proper formatting
+        parsed["all_suggestions"] = list(set(x for x in parsed.get("all_suggestions", []) if x))
+        parsed["expanded_terms"] = list(set(x for x in parsed.get("expanded_terms", []) if x))
+        parsed["abbreviations"] = list(set(x for x in parsed.get("abbreviations", []) if x))
+        
+        # Add the corrected query to suggestions if not already included
+        if parsed["corrected_query"] and parsed["corrected_query"] not in parsed["all_suggestions"]:
+            parsed["all_suggestions"].append(parsed["corrected_query"])
+            
+        # Add expanded terms and abbreviations to all_suggestions
+        parsed["all_suggestions"].extend([x for x in parsed["expanded_terms"] if x not in parsed["all_suggestions"]])
+        parsed["all_suggestions"].extend([x for x in parsed["abbreviations"] if x not in parsed["all_suggestions"]])
+        
         return parsed
 
     except Exception as e:
         logger.error(f"DeepSeek processing error: {e}")
-        # Fallback processing
+        # General fallback processing that doesn't rely on hardcoded special cases
         result = {
             "original_query": query,
             "corrected_query": query,
             "expanded_terms": [],
             "abbreviations": [],
-            "all_suggestions": []
+            "all_suggestions": [query]  # At minimum, include the original query
         }
 
         # Split query into terms
@@ -325,23 +312,27 @@ def generate_deepseek_response(query):
             term = term.strip()
             if not term:
                 continue
-            # Check if term is an abbreviation
+            
+            # Process abbreviations and full forms from our mapping
             if term.upper() in abbreviation_map:
                 full_form = abbreviation_map[term.upper()]
                 result["expanded_terms"].append(full_form)
                 result["abbreviations"].append(term.upper())
                 result["all_suggestions"].extend([term.upper(), full_form])
-            # Check if term is a full form
             elif term.lower() in reverse_map:
                 abbr = reverse_map[term.lower()]
                 result["expanded_terms"].append(term)
                 result["abbreviations"].append(abbr)
                 result["all_suggestions"].extend([term, abbr])
-            # Add term as-is
             else:
-                result["all_suggestions"].append(term)
+                if term not in result["all_suggestions"]:
+                    result["all_suggestions"].append(term)
 
+        # Remove duplicates
         result["all_suggestions"] = list(set(result["all_suggestions"]))
+        result["expanded_terms"] = list(set(result["expanded_terms"]))
+        result["abbreviations"] = list(set(result["abbreviations"]))
+        
         return result
 
 @app.route("/search", methods=["POST"])
@@ -354,6 +345,7 @@ def improved_search():
 
     # Process query using DeepSeek
     deepseek_response = generate_deepseek_response(query)
+    logger.info(f"Search query: {query}, DeepSeek response: {deepseek_response}")
 
     if not deepseek_response:
         return jsonify({
@@ -436,21 +428,34 @@ def get_student(student_id):
             return jsonify({"error": "Invalid student ID format"}), 400
         return jsonify({"error": "Failed to fetch student"}), 500
 
-@app.route("/generate-resume", methods=["POST"])
+@app.route("/generate-resume", methods=["POST","OPTIONS"])
 def generate_resume():
+        
     try:
+        if request.method == 'OPTIONS':
+        # Preflight request handling
+            return '', 200
         data = request.json
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        # Extract student data
-        student_data = data.get("student_data")
+        # ❌ Don't get student_data
+        # ✅ Get student_id
+        student_id = data.get("student_id")
         requirements = data.get("requirements", "")
-        
-        if not student_data:
-            return jsonify({"error": "No student data provided"}), 400
 
-        # Branch mapping
+        if not student_id:
+            return jsonify({"error": "No student ID provided"}), 400
+
+        # ✅ Now fetch the student from MongoDB
+        student_oid = ObjectId(student_id)
+        student_data = students_collection.find_one({"_id": student_oid})
+        
+
+        if not student_data:
+            return jsonify({"error": "Student not found"}), 404
+
+        # ✨ Now you can continue to generate resume using student_data
         branch_code = student_data.get("roll_no", "000")[6:9]
         branch_map = {
             "737": "Information Technology",
@@ -463,7 +468,6 @@ def generate_resume():
         }
         branch_name = branch_map.get(branch_code, "Engineering")
 
-        # Prepare prompt for DeepSeek
         prompt = f"""
         Create a professional resume using the following student data.
         
@@ -479,18 +483,21 @@ def generate_resume():
            - Tools:
            - Others: (if present only)
         6. Include only these sections in this order:
-           SUMMARY (4 lines only)(NO SUMMARY HEADING EXPLICITLY IT LOOKS ODD), TECHNICAL SKILLS, CERTIFICATIONS, 
+           SUMMARY (4 lines only)(HEADING AS OBJECTIVE), TECHNICAL SKILLS, CERTIFICATIONS, 
            PROJECTS AND TECHNICAL EVENTS, CO-CURRICULAR ACTIVITIES, 
            EXTRACURRICULAR ACTIVITIES.
+        7.STRICTLY Make all these sections headings BOLD and UPPERCASE.
+        
         
         STUDENT BACKGROUND:
         - Pursuing B.Tech in {branch_name}
-        - CGPA: {student_data.get("CGPA", "N/A")}
-        - LinkedIn: {student_data.get("linkedin", "Not provided")}
-        - GitHub: {student_data.get("github", "Not provided")}
-        
+        - CGPA: {student_data.get("CGPA", "N/A")}   
+        - LinkedIn: {student_data.get("linkedinProfile", "Not provided")}
+        - GitHub: {student_data.get("githubProfile", "Not provided")}
         ADDITIONAL REQUIREMENTS:
         {requirements if requirements else "No specific requirements provided."}
+        
+        
 
         SKILLS: {", ".join(student_data.get("skills", [])) or "None"}
         CERTIFICATIONS: {", ".join(student_data.get("certifications", [])) or "None"}
@@ -499,7 +506,7 @@ def generate_resume():
         EXTRA-CURRICULAR: {", ".join(student_data.get("extraCurricularActivities", [])) or "None"}
         """
 
-        # Call DeepSeek API
+        # DeepSeek AI call
         response = client.chat.completions.create(
             model="deepseek/deepseek-chat",
             messages=[{"role": "user", "content": prompt}],
@@ -509,28 +516,25 @@ def generate_resume():
         
         resume_text = response.choices[0].message.content.strip()
 
-        # Add education section at the beginning
-        education_section = f"""
-Chaitanya Bharathi Institute of Technology (CBIT)
+        education_section = f"""Chaitanya Bharathi Institute of Technology (CBIT)
 Bachelor of Technology in {branch_name} (Pursuing)
-CGPA: {student_data.get("CGPA", "N/A")}
-
+CGPA: {student_data.get("CGPA", "N/A")}\n
 """
-        
-        # Insert LinkedIn and GitHub under email if available
+        professional_details_section = f"""LinkedIn: {student_data.get("linkedinProfile", "Not provided")}\nGitHub: {student_data.get("githubProfile", "Not provided")}\n"""
+
         contact_info = []
-        if student_data.get("linkedin"):
-            contact_info.append(f"LinkedIn: {student_data['linkedin']}")
-        if student_data.get("github"):
-            contact_info.append(f"GitHub: {student_data['github']}")
-        
+        if student_data.get("linkedinProfile"):
+            contact_info.append(f"LinkedIn: {student_data['linkedinProfile']}")
+        if student_data.get("githubProfile"):
+            contact_info.append(f"GitHub: {student_data['githubProfile']}")
+
         if contact_info:
             resume_text = resume_text.replace(
                 "SUMMARY",
                 f"{' | '.join(contact_info)}\n\nSUMMARY"
             )
 
-        full_resume = "EDUCATION\n" + education_section + resume_text
+        full_resume = "CONTACT_INFO\n"+professional_details_section+ "\nEDUCATION\n" + education_section + resume_text
 
         return jsonify({
             "resume": full_resume,
@@ -543,5 +547,7 @@ CGPA: {student_data.get("CGPA", "N/A")}
             "error": "Failed to generate resume",
             "details": str(e)
         }), 500
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0",port=5000)
