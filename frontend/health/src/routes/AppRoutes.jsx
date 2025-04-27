@@ -12,8 +12,7 @@ import PersonalDetails from '../pages/PersonalDetails';
 import ProfessionalDetails from '../pages/ProfessionalDetails'; 
 import UpdatePersonalDetails from '../pages/updatePersonalDetails.jsx';
 import UpdateProfessionalDetails from '../pages/updateProfessionalDetails.jsx';
-import ProfilePage from "../pages/ProfilePage";
-<Route path="/profile/:id" element={<ProfilePage />} />
+import ProfilePage from "../pages/ProfilePage"; 
 
 const AppRoutes = () => {
   return (
@@ -31,7 +30,7 @@ const AppRoutes = () => {
       <Route path="/professional-details" element={<ProfessionalDetails />} /> 
       <Route path="/update-personal-details" element={<UpdatePersonalDetails />} />
       <Route path="/update-professional-details" element={<UpdateProfessionalDetails />} />
-
+      <Route path="/profile/:id" element={<ProfilePage />} />
  
       {/* Protected Routes */}
       <Route
