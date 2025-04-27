@@ -1,4 +1,4 @@
-import { useAuth } from "./context/AuthContext"; // ✅ No need to import AuthProvider here
+import { useAuth } from "./context/AuthContext"; 
 import AppRoutes from "./routes/AppRoutes";
 import Navbar from "./components/Navbar";
 
@@ -12,9 +12,9 @@ function App() {
 }
 
 function ConditionalNavbar() {
-  const { user } = useAuth(); // Get authentication state
+  const { user } = useAuth(); 
 
-  return user ? <Navbar /> : null; // Show Navbar only after login
+  return user ? <Navbar /> : null; 
 }
 
 export default App;
