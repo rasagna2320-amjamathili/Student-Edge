@@ -208,6 +208,21 @@ const StudentProfile = () => {
             <p>
               <strong>Current Semester:</strong> {personalData?.currentSemester || "-"}
             </p>
+            {personalData?.email && (
+              <p>
+                <strong>Email:</strong> {personalData.email}
+              </p>
+            )}
+            {personalData?.linkedin && (
+              <p>
+                <strong>LinkedIn:</strong> <a href={personalData.linkedin} target="_blank" rel="noopener noreferrer">{personalData.linkedin}</a>
+              </p>
+            )}
+            {personalData?.github && (
+              <p>
+                <strong>GitHub:</strong> <a href={personalData.github} target="_blank" rel="noopener noreferrer">{personalData.github}</a>
+              </p>
+            )}
           </div>
         </div>
 

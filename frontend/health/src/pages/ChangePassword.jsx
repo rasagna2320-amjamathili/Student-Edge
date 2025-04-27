@@ -9,6 +9,9 @@ const ChangePassword = () => {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const [passwordRequirements, setPasswordRequirements] = useState(""); // For displaying validation messages
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const navigate = useNavigate();
 
     const handleChangePassword = async (e) => {
@@ -34,15 +37,15 @@ const ChangePassword = () => {
             !/[A-Z]/.test(newPassword) ||
             !/[a-z]/.test(newPassword) ||
             !/[0-9]/.test(newPassword) ||
-            /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+            !/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
             setMessage("Password does not meet requirements:");
             setPasswordRequirements(
                 <ul>
-                    {newPassword.length < 8 && <li>At least 8 characters</li>}
-                    {!/[A-Z]/.test(newPassword) && <li>At least one uppercase letter</li>}
-                    {!/[a-z]/.test(newPassword) && <li>At least one lowercase letter</li>}
-                    {!/[0-9]/.test(newPassword) && <li>At least one number</li>}
-                    {!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) && <li>At least one special character</li>}
+                    {newPassword.length < 8 && <li className="error">At least 8 characters</li>}
+                    {!/[A-Z]/.test(newPassword) && <li className="error">At least one uppercase letter</li>}
+                    {!/[a-z]/.test(newPassword) && <li className="error">At least one lowercase letter</li>}
+                    {!/[0-9]/.test(newPassword) && <li className="error">At least one number</li>}
+                    {!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) && <li className="error">At least one special character</li>}
                 </ul>
             );
             setLoading(false);
@@ -104,36 +107,63 @@ const ChangePassword = () => {
                 <form onSubmit={handleChangePassword}>
                     <div className="form-group">
                         <label htmlFor="currentPassword">Current Password:</label>
-                        <input
-                            type="password"
-                            id="currentPassword"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                            className="form-control"
-                        />
+                        <div className="password-field">
+                            <input
+                                type={showCurrentPassword ? "text" : "password"}
+                                id="currentPassword"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                required
+                                className="form-control"
+                            />
+                            <button
+                                type="button"
+                                className="eye-icon"
+                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            >
+                                👁️
+                            </button>
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="newPassword">New Password:</label>
-                        <input
-                            type="password"
-                            id="newPassword"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                            className="form-control"
-                        />
+                        <div className="password-field">
+                            <input
+                                type={showNewPassword ? "text" : "password"}
+                                id="newPassword"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                required
+                                className="form-control"
+                            />
+                            <button
+                                type="button"
+                                className="eye-icon"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                            >
+                                👁️
+                            </button>
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="confirmNewPassword">Confirm New Password:</label>
-                        <input
-                            type="password"
-                            id="confirmNewPassword"
-                            value={confirmNewPassword}
-                            onChange={(e) => setConfirmNewPassword(e.target.value)}
-                            required
-                            className="form-control"
-                        />
+                        <div className="password-field">
+                            <input
+                                type={showConfirmNewPassword ? "text" : "password"}
+                                id="confirmNewPassword"
+                                value={confirmNewPassword}
+                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                required
+                                className="form-control"
+                            />
+                            <button
+                                type="button"
+                                className="eye-icon"
+                                onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                            >
+                                👁️
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" className="change-password-btn" disabled={loading}>
                         {loading ? "Updating..." : "Change Password"}
