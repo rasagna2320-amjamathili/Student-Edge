@@ -139,7 +139,7 @@ export const getStudentProfile = async (req, res) => {
             return res.status(400).json({ error: "Invalid user ID" });
         }
 
-        const student = await Student.findById(studentId).select('profilePicture name roll_no currentYear currentSemester'); 
+        const student = await Student.findById(studentId); 
 
         if (!student) {
             return res.status(404).json({ error: "Student not found" });
@@ -221,6 +221,7 @@ export const updatePersonalDetails = async (req, res) => {
           "interPercentage",
           "interBoard",
           "achievements",
+          "profilePicture"
       ];
 
       const filteredUpdateData = {};
@@ -256,55 +257,64 @@ export const updatePersonalDetails = async (req, res) => {
 
 // Function to update professional details
 export const updateProfessionalDetails = async (req, res) => {
-  try {
-      const studentId = req.user.id;
-      const updateData = { ...req.body };
+    try {
+        const studentId = req.user.id;
+        const updateData = { ...req.body };
+        console.log("Update Data:", updateData); // Debugging log
 
-      const allowedProfessionalFields = [
-          "currentYear",
-          "currentSemester",
-          "CGPA",
-          "skills",
-          "certifications",
-          "participatedTechEvents",
-          "extraCurricularActivities",
-          "coCurricularActivities",
-          "personalPortfolio",
-          "competitiveCodingProfiles",
-          "githubProfile",
-          "linkedinProfile",
-          "additionalFields",
-      ];
+        const allowedProfessionalFields = [
+            "currentYear",
+            "currentSemester",
+            "CGPA",
+            "skills",
+            "certifications",
+            "participatedTechEvents",
+            "extraCurricularActivities",
+            "coCurricularActivities",
+            "personalPortfolio",
+            "competitiveCodingProfiles",
+            "githubProfile",
+            "linkedinProfile",
+            "additionalFields",
+            "profilePicture"
+        ];
 
-      const filteredUpdateData = {};
-      allowedProfessionalFields.forEach((field) => {
-          if (updateData.hasOwnProperty(field)) {
-              filteredUpdateData[field] = updateData[field];
-          }
-      });
+        const filteredUpdateData = {};
+        allowedProfessionalFields.forEach((field) => {
+            if (updateData.hasOwnProperty(field)) {
+                filteredUpdateData[field] = updateData[field];
+            }
+        });
 
-      // Ensure array fields are handled correctly (if sent as strings)
-      ["skills", "certifications", "participatedTechEvents", "extraCurricularActivities", "coCurricularActivities", "competitiveCodingProfiles", "additionalFields"].forEach(field => {
-          if (filteredUpdateData[field] && typeof filteredUpdateData[field] === "string") {
-              filteredUpdateData[field] = filteredUpdateData[field].split(",").map(item => item.trim());
-          }
-      });
+        // Ensure array fields are handled correctly (if sent as strings)
+        ["skills", "certifications", "participatedTechEvents", "extraCurricularActivities", "coCurricularActivities", "competitiveCodingProfiles", "additionalFields"].forEach(field => {
+            if (filteredUpdateData[field] && typeof filteredUpdateData[field] === "string") {
+                filteredUpdateData[field] = filteredUpdateData[field].split(",").map(item => item.trim());
+            }
+        });
 
-      const updatedStudent = await Student.findByIdAndUpdate(
-          studentId,
-          { $set: filteredUpdateData },
-          { new: true, runValidators: true }
-      );
+        // Handle profile picture update
+        if (req.file) {
+            // If a new file is uploaded, update the profilePicture field with the URL
+            const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`; // Assuming your server is running on localhost:5000
+            filteredUpdateData.profilePicture = imageUrl;
+        }
 
-      if (!updatedStudent) {
-          return res.status(404).json({ error: "Student not found." });
-      }
+        const updatedStudent = await Student.findByIdAndUpdate(
+            studentId,
+            { $set: filteredUpdateData },
+            { new: true, runValidators: true }
+        );
 
-      res.status(200).json({
-          message: "Professional details updated successfully",
-          student: updatedStudent.toObject(),
-      });
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
+        if (!updatedStudent) {
+            return res.status(404).json({ error: "Student not found." });
+        }
+
+        res.status(200).json({
+            message: "Details updated successfully",
+            student: updatedStudent.toObject(),
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
