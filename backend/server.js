@@ -27,7 +27,8 @@ connectDB();
 app.get("/", (req, res) => res.send("API is running"));
 app.use("/api/students", studentRoutes);
 app.use("/api/cdcs", cdcRoutes);
-
+// Serve files from the "uploads" directory as static files
+app.use('/uploads', express.static('uploads'));
 
 
 // Route to get the visitor count
