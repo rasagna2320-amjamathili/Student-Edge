@@ -42,7 +42,7 @@ router.get("/personal-details", verifyToken, getPersonalDetails);
 router.put("/personal-details", verifyToken,upload.none(), updatePersonalDetails);
 
 router.get("/professional-details", verifyToken, getProfessionalDetails);
-router.put("/professional-details", verifyToken,upload.none(), updateProfessionalDetails);
+router.put("/professional-details", verifyToken, upload.single('profilePicture'), updateProfessionalDetails);
 
 router.get('/profile', verifyToken, getStudentProfile);
 router.get('/me', verifyToken, getStudentProfile);
