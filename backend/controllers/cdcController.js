@@ -45,7 +45,12 @@ export const loginCDC = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ error: "Email and password are required." });
         }
-  
+
+        const cdcPattern = /^cdc[a-zA-Z0-9_.]*@cbit\.org(\.in)?$/;
+      
+        if (!cdcPattern.test(email)) {
+          return res.status(400).json({ error: "Please enter a valid CDC email" });
+        }
         // Check if CDC user exists
         const cdcUser = await CDC.findOne({ email });
         if (!cdcUser) {
