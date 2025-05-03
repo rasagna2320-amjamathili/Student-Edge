@@ -10,7 +10,8 @@ import {
   getPersonalDetails,
   getProfessionalDetails,
   updatePersonalDetails,
-  updateProfessionalDetails
+  updateProfessionalDetails,
+  visitorCount
   
   
 } from "../controllers/studentController.js";
@@ -40,6 +41,7 @@ router.post("/login", loginUser);
 router.post("/createMultiple", createMultipleStudents);
 router.get("/personal-details", verifyToken, getPersonalDetails);
 router.put("/personal-details", verifyToken,upload.none(), updatePersonalDetails);
+router.get("/visitorCount", visitorCount); // New route to get visitor count
 
 router.get("/professional-details", verifyToken, getProfessionalDetails);
 router.put("/professional-details", verifyToken, upload.single('profilePicture'), updateProfessionalDetails);

@@ -6,13 +6,13 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: [/^1601(2[3-6])7(37|33)\d{3}$/, "Invalid roll number format"]
+    //match: [/^1601(2[3-6])7(37|33)\d{3}$/, "Invalid roll number format"]
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    match: [/^ugs\d{5}_(it|cse)\.[a-z]+@cbit\.org\.in$/, 'Invalid college email format']
+    //match: [/^ugs\d{5}_(it|cse)\.[a-z]+@cbit\.org\.in$/, 'Invalid college email format']
   },
   password: { type: String, required: true },
   profilePicture: { type: String, default: "" },
