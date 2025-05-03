@@ -82,7 +82,7 @@ const ProfessionalDetails = () => {
     return (
         <div className="professional-details-container">
             <div className="professional-details-card">
-                <h2>Present Profile</h2>
+                <h2>Profile</h2>
 
                 <div className="profile-pic-display" style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                     {student?.profilePicture ? (

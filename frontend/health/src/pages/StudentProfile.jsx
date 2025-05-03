@@ -85,7 +85,6 @@ const StudentProfile = () => {
 
   const generateResume = async () => {
     if (!personalData?._id) return;  // Prevent function execution if there's no student ID
-  
     setLoading(true);
   
     try {
@@ -122,68 +121,108 @@ const StudentProfile = () => {
   
   const downloadResumeAsPDF = () => {
     if (!resume || !personalData) return;
-
+  
     const doc = new jsPDF();
     const margin = 15;
-    const lineHeight = 8;
+    const lineHeight = 4;
     const pageHeight = doc.internal.pageSize.height;
     let y = 20;
-
+  
     // Student name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.text(personalData.name || "Student", 105, y, null, null, "center");
     y += 10;
-
+  
     // Email
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.text(personalData.email || "Email Not Available", 105, y, null, null, "center");
-    y += 10;
-
+    y += 7;
+  
     // LinkedIn and GitHub if available
-    if (personalData.linkedin || personalData.github) {
+    if (personalData.linkedinProfile || personalData.githubProfile) {
       let contactText = "";
-      if (personalData.linkedin && personalData.github) {
-        contactText = `LinkedIn: ${personalData.linkedin} | GitHub: ${personalData.github}`;
+      if (personalData.linkedinProfile && personalData.githubProfile) {
+        contactText = `LinkedIn: ${personalData.linkedinProfile} | GitHub: ${personalData.githubProfile}`;
       } else if (personalData.linkedin) {
         contactText = `LinkedIn: ${personalData.linkedin}`;
       } else {
         contactText = `GitHub: ${personalData.github}`;
       }
-
+  
       doc.setFontSize(10);
       doc.text(contactText, 105, y, null, null, "center");
       y += 10;
     }
-
-    // Resume content
+        if (resume.objective) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("OBJECTIVE", margin, y);
+        y += 8;
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        const splitLine = doc.splitTextToSize(resume.objective, 180);
+        splitLine.forEach((line) => {
+            doc.text(margin, y, line);
+            y += lineHeight;
+        });
+    }
+  
+    // Set font for EDUCATION heading and make it bold, same size as bolded resume content
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12); // Same font size as bold text in resume content
+    doc.text("EDUCATION", margin, y);
+    y += 8; // Line spacing after heading, same as the spacing after bolded content
+  
+    // Resume content with bold text where '**' is
     const lines = resume.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-
+  
       if (y + lineHeight > pageHeight - 10) {
         doc.addPage();
         y = 20;
       }
-
-      if (/^[A-Z ]+$/.test(line.trim()) && line.length < 40) {
-        doc.setFont("helvetica", "bold");
+  
+      // Detect bold sections surrounded by '**'
+      const boldLines = line.split("**");
+      if (boldLines.length > 1) {
+        // If the line contains '**', split and alternate between normal and bold text
+        boldLines.forEach((part, index) => {
+          if (index % 2 === 0) {
+            // Normal text
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+          } else {
+            // Bold text
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+          }
+  
+          const splitLine = doc.splitTextToSize(part, 180);
+          splitLine.forEach((l) => {
+            doc.text(margin, y, l);
+            y += lineHeight;
+          });
+        });
       } else {
+        // Normal text if no '**'
         doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        const splitLine = doc.splitTextToSize(line, 180);
+        splitLine.forEach((l) => {
+          doc.text(margin, y, l);
+          y += lineHeight;
+        });
       }
-
-      const splitLines = doc.splitTextToSize(line, 180);
-      splitLines.forEach((l) => {
-        doc.text(margin, y, l);
-        y += lineHeight;
-      });
     }
-
+  
     doc.save(`${(personalData.name || "Student").replace(/\s+/g, "_")}_Resume.pdf`);
   };
-
+  
   return (
     <div className="profile-container">
       <div className="profile-card">
@@ -208,21 +247,6 @@ const StudentProfile = () => {
             <p>
               <strong>Current Semester:</strong> {personalData?.currentSemester || "-"}
             </p>
-            {personalData?.email && (
-              <p>
-                <strong>Email:</strong> {personalData.email}
-              </p>
-            )}
-            {personalData?.linkedin && (
-              <p>
-                <strong>LinkedIn:</strong> <a href={personalData.linkedin} target="_blank" rel="noopener noreferrer">{personalData.linkedin}</a>
-              </p>
-            )}
-            {personalData?.github && (
-              <p>
-                <strong>GitHub:</strong> <a href={personalData.github} target="_blank" rel="noopener noreferrer">{personalData.github}</a>
-              </p>
-            )}
           </div>
         </div>
 
@@ -231,7 +255,7 @@ const StudentProfile = () => {
             Background Details
           </Link>
           <Link to="/professional-details" className="update-btn">
-            Present Profile
+            Profile
           </Link>
         </div>
 

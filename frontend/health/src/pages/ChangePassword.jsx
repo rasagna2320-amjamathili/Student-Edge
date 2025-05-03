@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ChangePassword.css"; 
+import "./ChangePassword.css";
 
 const ChangePassword = () => {
     const [currentPassword, setCurrentPassword] = useState("");
@@ -33,25 +33,36 @@ const ChangePassword = () => {
         }
 
         // Password Validation
-        if (newPassword.length < 8 ||
-            !/[A-Z]/.test(newPassword) ||
-            !/[a-z]/.test(newPassword) ||
-            !/[0-9]/.test(newPassword) ||
-            !/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+        const violations = [];
+
+        if (newPassword.length < 8) {
+            violations.push("At least 8 characters");
+        }
+        if (!/[A-Z]/.test(newPassword)) {
+            violations.push("At least one uppercase letter");
+        }
+        if (!/[a-z]/.test(newPassword)) {
+            violations.push("At least one lowercase letter");
+        }
+        if (!/[0-9]/.test(newPassword)) {
+            violations.push("At least one number");
+        }
+        if (!/[!@#$%^&*(),.?\":{}|<>]/.test(newPassword)) {
+            violations.push("At least one special character");
+        }
+
+        if (violations.length > 0) {
             setMessage("Password does not meet requirements:");
             setPasswordRequirements(
                 <ul>
-                    {newPassword.length < 8 && <li className="error">At least 8 characters</li>}
-                    {!/[A-Z]/.test(newPassword) && <li className="error">At least one uppercase letter</li>}
-                    {!/[a-z]/.test(newPassword) && <li className="error">At least one lowercase letter</li>}
-                    {!/[0-9]/.test(newPassword) && <li className="error">At least one number</li>}
-                    {!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) && <li className="error">At least one special character</li>}
+                    {violations.map((violation, index) => (
+                        <li key={index} className="error">{violation}</li>
+                    ))}
                 </ul>
             );
             setLoading(false);
             return;
         }
-
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -74,13 +85,13 @@ const ChangePassword = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setMessage(data.message || "Password updated successfully!");
-                navigate(-1);
+                alert(data.message || "Password updated successfully!"); // <-- show alert box
                 setCurrentPassword("");
                 setNewPassword("");
                 setConfirmNewPassword("");
+                navigate(-1); // Navigate *after* alert is closed
             } else {
-                setMessage(data.message || "Failed to change password.");
+                alert(data.message || "Failed to change password."); // <-- also use alert for errors
             }
         } catch (error) {
             console.error("Error changing password:", error);
