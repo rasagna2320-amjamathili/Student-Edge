@@ -24,7 +24,7 @@ db = client['studentEdgeDB']
 students_collection = db['students']
 
 # Configure OpenRouter API with DeepSeek
-API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
 client = openai.OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=API_KEY
@@ -475,18 +475,20 @@ def generate_resume():
         1. STRICTLY EXCLUDE THE EDUCATION SECTION (we'll add it separately)
         2. DO NOT include any mention of the student's name or email
         3. DO NOT use markdown (no asterisks or symbols)
-        4. Use ALL UPPERCASE HEADINGS(BOLD)(OTHER DETAILS LOWERCASE)
-        5. Structure SKILLS into subcategories like:
-           - Programming Languages:
-           - Databases:
-           - Frameworks/Libraries:
-           - Tools:
-           - Others: (if present only)
+        4. Use ALL UPPERCASE HEADINGS(BOLD)(OTHER DETAILS LOWERCASE, except the starting letter of the heading text, make that capital)
+        5. Structure SKILLS into subcategories like:(STRICTLY ADD BULLET POINTS in place of hyphens, one for each sub category, same line only bullet points and the whole sub category in one line)
+
+            -Programming Languages:
+            -Databases:
+            -Frameworks/Libraries:
+            -Tools:
+            -Others: (if present only)
         6. Include only these sections in this order:
            SUMMARY (4 lines only)(HEADING AS OBJECTIVE), TECHNICAL SKILLS, CERTIFICATIONS, 
            PROJECTS AND TECHNICAL EVENTS, CO-CURRICULAR ACTIVITIES, 
            EXTRACURRICULAR ACTIVITIES.
         7.STRICTLY Make all these sections headings BOLD and UPPERCASE.
+    
         
         
         STUDENT BACKGROUND:
@@ -494,8 +496,7 @@ def generate_resume():
         - CGPA: {student_data.get("CGPA", "N/A")}   
         - LinkedIn: {student_data.get("linkedinProfile", "Not provided")}
         - GitHub: {student_data.get("githubProfile", "Not provided")}
-        ADDITIONAL REQUIREMENTS:
-        {requirements if requirements else "No specific requirements provided."}
+        
         
         
 
@@ -534,7 +535,7 @@ CGPA: {student_data.get("CGPA", "N/A")}\n
                 f"{' | '.join(contact_info)}\n\nSUMMARY"
             )
 
-        full_resume = "CONTACT_INFO\n"+professional_details_section+ "\nEDUCATION\n" + education_section + resume_text
+        full_resume = education_section + resume_text
 
         return jsonify({
             "resume": full_resume,
