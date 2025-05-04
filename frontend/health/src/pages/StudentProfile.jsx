@@ -21,8 +21,8 @@ const StudentProfile = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+    // Add any logout logic here (e.g., clearing tokens, session data)
+    navigate("/");
   };
 
   useEffect(() => {
@@ -38,7 +38,6 @@ const StudentProfile = () => {
         }
         const data = await response.json();
         setPersonalData(data); // Store all profile data including email, linkedin, github
-
       } catch (err) {
         setError(err.message);
         console.error("Error fetching profile data:", err);
@@ -86,7 +85,7 @@ const StudentProfile = () => {
   const generateResume = async () => {
     if (!personalData?._id) return;  // Prevent function execution if there's no student ID
     setLoading(true);
-  
+
     try {
       const response = await fetch("http://127.0.0.1:5000/generate-resume", {
         method: "POST",
@@ -99,17 +98,17 @@ const StudentProfile = () => {
           requirements: requirements,    // Sending additional data for resume
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`); // Throw error if response is not OK (not 2xx)
       }
-  
+
       const data = await response.json();
-  
+
       if (data.error) {
         throw new Error(data.error);  // Throw error if the response contains an error message
       }
-  
+
       setResume(data.resume);  // Set only resume text, not the whole object
     } catch (error) {
       console.error("Error generating resume:", error);
@@ -118,28 +117,28 @@ const StudentProfile = () => {
       setLoading(false);
     }
   };
-  
+
   const downloadResumeAsPDF = () => {
     if (!resume || !personalData) return;
-  
+
     const doc = new jsPDF();
     const margin = 15;
     const lineHeight = 4;
     const pageHeight = doc.internal.pageSize.height;
     let y = 20;
-  
+
     // Student name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.text(personalData.name || "Student", 105, y, null, null, "center");
     y += 10;
-  
+
     // Email
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.text(personalData.email || "Email Not Available", 105, y, null, null, "center");
     y += 7;
-  
+
     // LinkedIn and GitHub if available
     if (personalData.linkedinProfile || personalData.githubProfile) {
       let contactText = "";
@@ -150,43 +149,43 @@ const StudentProfile = () => {
       } else {
         contactText = `GitHub: ${personalData.github}`;
       }
-  
+
       doc.setFontSize(10);
       doc.text(contactText, 105, y, null, null, "center");
       y += 10;
     }
-        if (resume.objective) {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.text("OBJECTIVE", margin, y);
-        y += 8;
-        
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(12);
-        const splitLine = doc.splitTextToSize(resume.objective, 180);
-        splitLine.forEach((line) => {
-            doc.text(margin, y, line);
-            y += lineHeight;
-        });
+    if (resume.objective) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("OBJECTIVE", margin, y);
+      y += 8;
+      
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      const splitLine = doc.splitTextToSize(resume.objective, 180);
+      splitLine.forEach((line) => {
+          doc.text(margin, y, line);
+          y += lineHeight;
+      });
     }
-  
+
     // Set font for EDUCATION heading and make it bold, same size as bolded resume content
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12); // Same font size as bold text in resume content
     doc.text("EDUCATION", margin, y);
     y += 8; // Line spacing after heading, same as the spacing after bolded content
-  
+
     // Resume content with bold text where '**' is
     const lines = resume.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-  
+
       if (y + lineHeight > pageHeight - 10) {
         doc.addPage();
         y = 20;
       }
-  
+
       // Detect bold sections surrounded by '**'
       const boldLines = line.split("**");
       if (boldLines.length > 1) {
@@ -201,7 +200,7 @@ const StudentProfile = () => {
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
           }
-  
+
           const splitLine = doc.splitTextToSize(part, 180);
           splitLine.forEach((l) => {
             doc.text(margin, y, l);
@@ -219,10 +218,10 @@ const StudentProfile = () => {
         });
       }
     }
-  
+
     doc.save(`${(personalData.name || "Student").replace(/\s+/g, "_")}_Resume.pdf`);
   };
-  
+
   return (
     <div className="profile-container">
       <div className="profile-card">
@@ -290,7 +289,7 @@ const StudentProfile = () => {
         {isMenuOpen && (
           <div className="menu-options">
             <Link to="/change-password">Change Password</Link>
-            <button onClick={handleLogout}>Logout</button>
+            <button onClick={handleLogout} className="logout-btn">Logout</button>
           </div>
         )}
       </div>
