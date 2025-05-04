@@ -24,7 +24,7 @@ db = client['studentEdgeDB']
 students_collection = db['students']
 
 # Configure OpenRouter API with DeepSeek
-API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
 client = openai.OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=API_KEY
