@@ -24,7 +24,7 @@ db = client['studentEdgeDB']
 students_collection = db['students']
 
 # Configure OpenRouter API with DeepSeek
-API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
 client = openai.OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=API_KEY
@@ -488,7 +488,6 @@ def generate_resume():
            PROJECTS AND TECHNICAL EVENTS, CO-CURRICULAR ACTIVITIES, 
            EXTRACURRICULAR ACTIVITIES.
         7.STRICTLY Make all these sections headings BOLD and UPPERCASE.
-        
     
         
         
@@ -552,4 +551,8 @@ CGPA: {student_data.get("CGPA", "N/A")}\n
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     app.run(host="0.0.0.0",port=5000)
+=======
+    app.run(host="0.0.0.0",port=5000)
+>>>>>>> 04b26a9b1a797fc1c26749ce4015a3be075e3335

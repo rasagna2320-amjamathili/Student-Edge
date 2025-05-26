@@ -5,7 +5,6 @@ import "./Homepage.css";
 const Home = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [visitorCount, setVisitorCount] = useState(0);
-  
 
   useEffect(() => {
     const fetchVisitorCount = async () => {

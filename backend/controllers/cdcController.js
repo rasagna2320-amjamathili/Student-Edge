@@ -82,6 +82,7 @@ export const loginCDC = async (req, res) => {
             message: "Login successful!",
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 };

@@ -203,7 +203,7 @@ import StudentCard from "./StudentCard";
 import { CSVLink } from "react-csv";
 import { FiUpload, FiDownload, FiLogOut } from "react-icons/fi";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://192.168.0.196:5000";
 
 export default function Dashboard() {
   const [search, setSearch] = useState("");
