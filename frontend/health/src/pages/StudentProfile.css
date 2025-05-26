@@ -367,3 +367,29 @@ button {
     margin: 0;
     font-weight: bold;
  }
+ #Loading_resume{
+    font-size: 28px;  /* Adjust the size as needed */
+    color: #333;      /* Color of the text */
+    font-weight: bold; /* Optional, if you want bold text */
+    text-align: center; /* Optional, to center the message */
+    animation: fadeIn 1s ease;
+ }
+ #Loading_profile{
+    font-size: 22px;  /* Adjust the size as needed */
+    color: #333;      /* Color of the text */
+    font-weight: bold; /* Optional, if you want bold text */
+    text-align: center; /* Optional, to center the message */
+    animation: fadeIn 1s ease;
+
+ }
+ #Loading_resume{
+    font-size: 28px;  /* Adjust the size as needed */
+    color: #333;      /* Color of the text */
+    font-weight: bold; /* Optional, if you want bold text */
+    text-align: center; /* Optional, to center the message */
+    animation: fadeIn 1s ease;
+ }
+ @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

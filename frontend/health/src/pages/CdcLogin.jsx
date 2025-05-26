@@ -28,7 +28,13 @@ const CdcLogin = () => {
         setError(response.data.message);
       }
     } catch (err) {
-      setError("Invalid credentials or server error.");
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || err.response.data.error || "Invalid credentials or server error.");
+      } else {
+        setError("Invalid credentials or server error.");
+      }
+      
+      
     } finally {
       setLoading(false);
     }

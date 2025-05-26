@@ -196,13 +196,14 @@ export default function Dashboard() {
 }
 */
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 import StudentCard from "./StudentCard";
 import { CSVLink } from "react-csv";
-import { FiUpload, FiDownload } from "react-icons/fi";
+import { FiUpload, FiDownload, FiLogOut } from "react-icons/fi";
 
-const API_BASE = "http://192.168.0.196:5000";
+const API_BASE = "http://localhost:5000";
 
 export default function Dashboard() {
   const [search, setSearch] = useState("");
@@ -222,6 +223,13 @@ export default function Dashboard() {
   const [matchThreshold, setMatchThreshold] = useState(0);
   const [uploadStatus, setUploadStatus] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Add any logout logic here (e.g., clearing tokens, session data)
+    navigate("/");
+  };
 
   useEffect(() => {
     fetchStudents();
@@ -456,10 +464,9 @@ export default function Dashboard() {
     try {
       const response = await axios.post(`${API_BASE}/search`, { query: search });
       const improvedQueries = response.data.improved_queries || [];
-      // Ensure full phrases and abbreviations are included
       const processedTerms = processSearchTerms(search);
       setSuggestions([...new Set([...improvedQueries, ...processedTerms])]);
-      setSearchTerms(processedTerms); // Use processed terms for matching
+      setSearchTerms(processedTerms);
     } catch (err) {
       console.error("Error fetching suggestions:", err);
       setSuggestions([]);
@@ -478,7 +485,6 @@ export default function Dashboard() {
       "machine learning": ["ml"],
       "sql": ["structured query language"],
       "structured query language": ["sql"],
-      // Add more mappings as needed
     };
     const allTerms = [];
     terms.forEach(term => {
@@ -521,7 +527,13 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">CDC Dashboard</h1>
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">CDC Dashboard</h1>
+        <button className="logout-btn" onClick={handleLogout}>
+          <FiLogOut className="btn-icon" />
+          Logout
+        </button>
+      </div>
       <div className="status-bar">
         <span>AI Status: {aiStatus}</span>
         {isLoading && <span className="loading">Loading...</span>}
