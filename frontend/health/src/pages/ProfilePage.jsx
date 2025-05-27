@@ -4,7 +4,7 @@ import axios from "axios";
 import { FaGithub, FaLinkedin, FaArrowLeft } from "react-icons/fa";
 import "./ProfilePage.css";
 
-const API_BASE = "http://192.168.0.196:5000";
+const API_BASE = "http://localhost:5000";
 
 export default function ProfilePage() {
   const { id } = useParams();

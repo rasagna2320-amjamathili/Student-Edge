@@ -9,8 +9,10 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Configure Gemini API - make sure you have GOOGLE_API_KEY in .env
-genai.configure(api_key="AIzaSyAVUroR7W1uC7-NMyac99XMs3S5DVTinDg")
+# Configure Gemini API
+genai.configure(api_key=os.getenv("api_key_flask"))
+
+# Initialize model
 model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
 
 @app.route('/api/generate-resume', methods=['POST'])

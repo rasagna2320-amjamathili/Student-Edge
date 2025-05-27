@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();  // ✅ Use inside the function
     try {
       const url = userType === "student" ? "/login" : "/api/cdc-login";
-      const res = await axios.post(`http://172.16.4.89:5000${url}`, credentials);
+      const res = await axios.post(`http://localhost:5000${url}`, credentials);
       
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", userType);

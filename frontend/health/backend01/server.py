@@ -13,20 +13,19 @@ import tempfile
 import io
 
 app = Flask(__name__)
-#CORS(app, resources={r"/generate-resume": {"origins": "*"}})
 CORS(app)
 
 
 # Configure MongoDB
-MONGO_URI = "mongodb+srv://rasagna2023:MongoDB_password@cluster0.g8rue.mongodb.net/studentEdgeDB?retryWrites=true&w=majority&appName=Cluster0"
+MONGO_URI = os.getenv("MONGO_URL")
 client = MongoClient(MONGO_URI)
 db = client['studentEdgeDB']
 students_collection = db['students']
 
 # Configure OpenRouter API with DeepSeek
-API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 client = openai.OpenAI(
-    base_url="https://openrouter.ai/api/v1",
+    base_url=os.getenv("OPENROUTER_BASE_URL")
     api_key=API_KEY
 )
 
@@ -551,8 +550,4 @@ CGPA: {student_data.get("CGPA", "N/A")}\n
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app.run(host="0.0.0.0",port=5000)
-=======
-    app.run(host="0.0.0.0",port=5000)
->>>>>>> 04b26a9b1a797fc1c26749ce4015a3be075e3335

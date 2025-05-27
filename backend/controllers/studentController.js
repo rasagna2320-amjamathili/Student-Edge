@@ -306,8 +306,6 @@ export const updateProfessionalDetails = async (req, res) => {
     try {
         const studentId = req.user.id;
         const updateData = { ...req.body };
-        console.log("Update Data:", updateData); // Debugging log
-
         const allowedProfessionalFields = [
             "currentYear",
             "currentSemester",
@@ -341,11 +339,11 @@ export const updateProfessionalDetails = async (req, res) => {
 
         // Handle profile picture update
         if (req.file) {
-            // If a new file is uploaded, update the profilePicture field with the URL
-            const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`; // Assuming your server is running on localhost:5000
+            const imageUrl = `${process.env.CONTROLLER_URL}/uploads/${req.file.filename}`;
             filteredUpdateData.profilePicture = imageUrl;
         }
-
+        
+    
         const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
             { $set: filteredUpdateData },
