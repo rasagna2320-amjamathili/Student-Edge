@@ -1,11 +1,7 @@
 ## 🖼️ Project Screenshots
 
-Below are all screenshots uploaded under the `screenshots/` folder.
-
----
-
 ![Screenshot 017](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.017.png)
-<br>
+<br><span>Student Edge Landing Page</span>
 ![Screenshot 018](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.018.png)<br>
 ![Screenshot 019](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.019.png)<br>
 ![Screenshot 020](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.020.png)<br>
