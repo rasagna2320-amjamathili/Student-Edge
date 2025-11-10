@@ -1,38 +1,41 @@
-## 🖼️ Project Screenshots
+## 📸 Project Screenshots
 
-Below are all screenshots uploaded under the `screenshots/` folder.
+Here’s a preview of the Student-Edge project UI and features.
 
 ---
 
-![Screenshot 017](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.017.png)
-![Screenshot 018](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.018.png)
-![Screenshot 019](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.019.png)
-![Screenshot 020](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.020.png)
-![Screenshot 021](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.021.png)
-![Screenshot 022](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.022.png)
-![Screenshot 023](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.023.png)
-![Screenshot 024](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.024.png)
-![Screenshot 025](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.025.png)
-![Screenshot 026](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.026.png)
-![Screenshot 027](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.027.png)
-![Screenshot 028](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.028.png)
-![Screenshot 029](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.029.png)
-![Screenshot 030](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.030.png)
-![Screenshot 031](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.031.png)
-![Screenshot 032](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.032.png)
-![Screenshot 033](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.033.png)
-![Screenshot 034](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.034.png)
-![Screenshot 035](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.035.png)
-![Screenshot 036](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.036.png)
-![Screenshot 037](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.037.png)
-![Screenshot 038](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.038.png)
-![Screenshot 039](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.039.png)
-![Screenshot 040](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.040.png)
-![Screenshot 041](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.041.png)
-![Screenshot 042](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.042.png)
-![Screenshot 043](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.043.png)
-![Screenshot 044](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.044.png)
-![Screenshot 045](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.045.png)
-![Screenshot 046](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.046.png)
-![Screenshot 047](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.047.png)
-![Screenshot 048](https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.048.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.017.png" width="45%" style="margin:10px;">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.018.png" width="45%" style="margin:10px;">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.019.png" width="45%" style="margin:10px;">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.020.png" width="45%" style="margin:10px;">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.021.png" width="45%" style="margin:10px;">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.022.png" width="45%" style="margin:10px;">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.023.png" width="45%" style="margin:10px;">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.024.png" width="45%" style="margin:10px;">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.025.png" width="45%" style="margin:10px;">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.026.png" width="45%" style="margin:10px;">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.027.png" width="45%" style="margin:10px;">
+  <img src="https://raw.githubusercontent.com/rasagna2320-amjamathili/Student-Edge/backend/screenshots/Aspose.Words.3655ba0e-be48-441c-b8a7-ef77c535c251.028.png" width="45%" style="margin:10px;">
+</p>
+
+---
+
+> 🧠 **Tip:**  
+> Adjust the `width="45%"` to `width="30%"` for 3 images per row,  
+> or `width="100%"` if you want each image full-width on its own line.
